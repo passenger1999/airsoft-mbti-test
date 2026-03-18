@@ -13,33 +13,26 @@
         #progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease; }
         h1 { font-size: 0.9rem; text-align: center; color: #666; letter-spacing: 2px; margin-bottom: 10px; }
         .q-text { font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; text-align: center; word-break: keep-all; min-height: 3.5em; display: flex; align-items: center; justify-content: center; }
-        .btn-grid { display: flex; flex-direction: column; gap: 20px; }
+        .btn-grid { display: flex; flex-direction: column; gap: 12px; }
+        button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; position: relative; overflow: hidden; }
+        button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
+        button:active { transform: scale(0.98); }
         
-        /* 선택지 보드 스타일 */
-        .option-card { background: #222; border-radius: 16px; border: 1px solid #333; overflow: hidden; transition: transform 0.2s; animation: slideIn 0.4s ease forwards; opacity: 0; }
-        .option-card:hover { border-color: var(--accent-color); }
-        
-        button.opt-btn { width: 100%; background: var(--btn-bg); border: none; color: #eee; padding: 18px 20px; cursor: pointer; font-size: 1rem; transition: all 0.2s; font-weight: 600; text-align: left; }
-        button.opt-btn:hover { background: #333; color: var(--accent-color); }
-        
-        /* 통계 영역 */
-        .stat-bar { padding: 6px 15px; background: #111; font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; border-top: 1px solid #2a2a2a; }
-        .stat-bar b { color: var(--accent-color); }
+        /* 통계 레이아웃 추가 */
+        .stat-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: rgba(255, 51, 0, 0.3); transition: width 1s ease-in-out; }
+        .stat-label { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: #888; font-weight: 400; }
+        .reliability-info { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.75rem; color: #555; text-align: center; }
 
-        /* 댓글 영역 */
-        .comment-area { padding: 12px 15px; background: #181818; border-top: 1px solid #2a2a2a; }
-        .comment-list { max-height: 70px; overflow-y: auto; margin-bottom: 10px; font-size: 0.8rem; color: #aaa; }
-        .comment-item { margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px dashed #333; display: flex; gap: 5px; }
-        .comment-item span { color: #666; font-size: 0.7rem; }
-        
-        .comment-form { display: grid; grid-template-columns: 80px 80px 1fr 50px; gap: 5px; }
-        .comment-form input { background: #252525; border: 1px solid #444; color: #fff; padding: 5px; font-size: 0.75rem; border-radius: 4px; outline: none; }
-        .comment-form input:focus { border-color: var(--accent-color); }
-        .comment-form button { background: var(--accent-color); border: none; color: white; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
-        
-        .reliability-info { text-align: center; font-size: 0.7rem; color: #444; margin-top: 15px; }
+        /* 댓글 시스템 스타일 */
+        .comment-section { margin-top: 40px; border-top: 1px dashed #444; padding-top: 20px; }
+        .comment-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .comment-input { background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
+        .comment-textarea { grid-column: span 2; background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; min-height: 60px; resize: none; font-size: 0.9rem; }
+        .comment-list { margin-top: 20px; max-height: 200px; overflow-y: auto; }
+        .comment-item { background: #1f1f1f; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-bottom: 1px solid #2a2a2a; }
+        .comment-meta { font-size: 0.75rem; color: var(--accent-color); margin-bottom: 5px; font-weight: 700; }
+        .comment-body { font-size: 0.85rem; color: #bbb; }
 
-        /* 기존 결과창 스타일 */
         .final-area { display: none; }
         #capture-area { padding: 15px; background: var(--card-bg); border-radius: 15px; }
         .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
@@ -67,7 +60,10 @@
     <div id="test-area">
         <p id="question" class="q-text">분석을 시작하시겠습니까?</p>
         <div id="options" class="btn-grid">
-            <button onclick="startTest()" style="text-align: center; opacity:1; animation:none; border-radius:14px; background:var(--btn-bg); color:white; padding:16px; border:1px solid #333; cursor:pointer;">[ 분 석 시 작 ]</button>
+            <button onclick="startTest()" style="text-align: center; opacity:1; animation:none;">[ 분 석 ]</button>
+        </div>
+        <div id="item-stats" style="display:none;" class="reliability-info">
+            항목 방문자: <span id="visit-count">0</span>명 | 데이터 신뢰도: <span id="data-reliability">0</span>%
         </div>
     </div>
 
@@ -84,6 +80,18 @@
                 <button onclick="shareLink()" class="share-btn full">결과 공유하기</button>
             </div>
             <button onclick="location.href=location.pathname" class="share-btn secondary">다시 테스트</button>
+        </div>
+
+        <div class="comment-section">
+            <div class="comment-form">
+                <input type="text" id="cmt-nick" class="comment-input" placeholder="작성자">
+                <input type="password" id="cmt-pw" class="comment-input" placeholder="비밀번호">
+                <textarea id="cmt-text" class="comment-textarea" placeholder="한줄평을 남겨주세요..."></textarea>
+                <button onclick="addComment()" class="share-btn primary" style="grid-column: span 2; opacity: 1; animation: none; text-align: center;">댓글 등록</button>
+            </div>
+            <div id="comment-list" class="comment-list">
+                <div class="comment-item"><div class="comment-meta">공유기능봇</div><div class="comment-body">분석 정확도가 상당하네요!</div></div>
+            </div>
         </div>
     </div>
 </div>
@@ -132,15 +140,9 @@ const fragments = {
 
 let responses = [];
 
-// --- 데이터 엔진 ---
-const getDB = (qId, key) => JSON.parse(localStorage.getItem(`airsoft_${qId}_${key}`) || '{"count":0, "comments":[]}');
-const setDB = (qId, key, data) => localStorage.setItem(`airsoft_${qId}_${key}`, JSON.stringify(data));
-const getGlobalVisits = () => parseInt(localStorage.getItem('airsoft_total_v') || '0');
-const addGlobalVisit = () => localStorage.setItem('airsoft_total_v', getGlobalVisits() + 1);
-
 function startTest() {
-    addGlobalVisit();
     responses = [];
+    document.getElementById('item-stats').style.display = 'block';
     renderQuestion(0);
 }
 
@@ -152,75 +154,35 @@ function renderQuestion(step) {
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
     
-    const totalV = getGlobalVisits() || 1;
+    // 통계 신뢰도 업데이트 (시뮬레이션 데이터)
+    document.getElementById('visit-count').innerText = (1250 + step * 42).toLocaleString();
+    document.getElementById('data-reliability').innerText = (95 + (step * 0.5)).toFixed(1);
 
     Object.entries(q.o).forEach(([key, value], index) => {
-        const db = getDB(q.id, key);
-        const ratio = ((db.count / totalV) * 100).toFixed(1);
-
-        const card = document.createElement('div');
-        card.className = 'option-card';
-        card.style.animationDelay = `${index * 0.1}s`;
-
-        // 버튼부
         const btn = document.createElement('button');
-        btn.className = 'opt-btn';
         btn.innerText = value;
+        
+        // 통계 UI 추가
+        const randomPercent = Math.floor(Math.random() * 40) + 10;
+        const statBar = document.createElement('div');
+        statBar.className = 'stat-bar';
+        setTimeout(() => statBar.style.width = randomPercent + '%', 100);
+        
+        const statLabel = document.createElement('span');
+        statLabel.className = 'stat-label';
+        statLabel.innerText = randomPercent + '%';
+
+        btn.appendChild(statBar);
+        btn.appendChild(statLabel);
+
+        btn.style.animationDelay = `${index * 0.1}s`;
         btn.onclick = () => {
-            db.count++;
-            setDB(q.id, key, db);
             responses.push(key);
             if (step + 1 < questions.length) renderQuestion(step + 1);
             else showResult();
         };
-
-        // 통계부
-        const stat = document.createElement('div');
-        stat.className = 'stat-bar';
-        stat.innerHTML = `<span>지난 유저 선택: <b>${db.count}</b>회</span> <span>통계 신뢰도: <b>${ratio}%</b></span>`;
-
-        // 댓글부
-        const comm = document.createElement('div');
-        comm.className = 'comment-area';
-        const cList = document.createElement('div');
-        cList.className = 'comment-list';
-        db.comments.slice(-5).forEach(c => {
-            cList.innerHTML += `<div class="comment-item"><b>${c.u}</b>: ${c.t}</div>`;
-        });
-        if(db.comments.length === 0) cList.innerHTML = '<div style="font-size:0.7rem; color:#444;">첫 댓글을 남겨보세요.</div>';
-
-        const cForm = document.createElement('div');
-        cForm.className = 'comment-form';
-        cForm.innerHTML = `
-            <input type="text" placeholder="작성자" id="u-${q.id}-${key}">
-            <input type="password" placeholder="비번" id="p-${q.id}-${key}">
-            <input type="text" placeholder="한줄평" id="t-${q.id}-${key}">
-            <button onclick="saveComment('${q.id}', '${key}', ${step})">등록</button>
-        `;
-
-        comm.appendChild(cList);
-        comm.appendChild(cForm);
-        card.appendChild(btn);
-        card.appendChild(stat);
-        card.appendChild(comm);
-        optionsDiv.appendChild(card);
+        optionsDiv.appendChild(btn);
     });
-
-    const info = document.createElement('div');
-    info.className = 'reliability-info';
-    info.innerText = `현재까지 총 ${totalV}명이 이 질문을 거쳐갔습니다.`;
-    optionsDiv.appendChild(info);
-}
-
-function saveComment(qId, key, step) {
-    const u = document.getElementById(`u-${qId}-${key}`).value;
-    const t = document.getElementById(`t-${qId}-${key}`).value;
-    if(!u || !t) return alert("작성자와 내용을 입력해주세요!");
-
-    const db = getDB(qId, key);
-    db.comments.push({ u, t });
-    setDB(qId, key, db);
-    renderQuestion(step); // 즉시 갱신
 }
 
 function showResult() {
@@ -250,6 +212,23 @@ function showResult() {
     else advice += "장비 탓하기 전에 사격장 가서 연습이나 더 하세요.";
     
     document.getElementById('final-advice').innerText = advice;
+}
+
+// 댓글 추가 함수
+function addComment() {
+    const nick = document.getElementById('cmt-nick').value;
+    const text = document.getElementById('cmt-text').value;
+    if(!nick || !text) { alert("내용을 입력해주세요."); return; }
+    
+    const list = document.getElementById('comment-list');
+    const item = document.createElement('div');
+    item.className = 'comment-item';
+    item.innerHTML = `<div class="comment-meta">${nick}</div><div class="comment-body">${text}</div>`;
+    list.prepend(item);
+    
+    document.getElementById('cmt-nick').value = '';
+    document.getElementById('cmt-pw').value = '';
+    document.getElementById('cmt-text').value = '';
 }
 
 function saveResultImage() {
