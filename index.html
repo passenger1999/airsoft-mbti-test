@@ -32,7 +32,6 @@
 
         .reliability-info { margin-top: 20px; font-size: 0.7rem; color: #555; text-align: center; }
 
-        /* 댓글 스타일 */
         .comment-section { margin-top: 40px; border-top: 1px dashed #444; padding-top: 20px; }
         .comment-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .comment-input { background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
@@ -98,7 +97,6 @@
 </div>
 
 <script>
-// 업로드해주신 정보를 바탕으로 설정 완료 
 const firebaseConfig = {
   apiKey: "AIzaSyDtbu7D79svCC2prd43o2KblmvVCKHrPaU",
   authDomain: "airsoft-mbti-test.firebaseapp.com",
@@ -178,11 +176,20 @@ async function renderQuestion(step) {
     optionsDiv.innerHTML = '';
     statList.innerHTML = '통계 로딩 중...';
 
-    // Firebase 통계 가져오기
-    const docRef = db.collection("stats").doc(q.id);
-    const doc = await docRef.get();
-    let statData = doc.exists ? doc.data() : {};
-    let total = Object.values(statData).reduce((a, b) => a + b, 0) || 1;
+    let statData = {};
+    let total = 1;
+
+    try {
+        const docRef = db.collection("stats").doc(q.id);
+        const doc = await docRef.get();
+        if (doc.exists) {
+            statData = doc.data();
+            total = Object.values(statData).reduce((a, b) => a + b, 0) || 1;
+        }
+    } catch (e) {
+        console.error("Firebase 통계 오류:", e);
+        statList.innerHTML = '통계 데이터를 불러올 수 없습니다.';
+    }
 
     statList.innerHTML = '';
     Object.entries(q.o).forEach(([key, value], index) => {
@@ -190,7 +197,10 @@ async function renderQuestion(step) {
         btn.innerText = value;
         btn.style.animationDelay = `${index * 0.1}s`;
         btn.onclick = async () => {
-            await docRef.set({ [key]: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+            try {
+                await db.collection("stats").doc(q.id).set({ [key]: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+            } catch (e) { console.error("데이터 저장 실패:", e); }
+            
             responses.push(key);
             if (step + 1 < questions.length) renderQuestion(step + 1);
             else showResult();
@@ -237,34 +247,40 @@ function showResult() {
     document.getElementById('final-advice').innerText = advice;
 }
 
-// 댓글 시스템 구현
 async function addComment() {
     const nick = document.getElementById('cmt-nick').value;
     const text = document.getElementById('cmt-text').value;
     if(!nick || !text) return alert("내용을 입력해주세요.");
 
-    await db.collection("comments").add({
-        nickname: nick,
-        content: text,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    document.getElementById('cmt-nick').value = '';
-    document.getElementById('cmt-text').value = '';
+    try {
+        await db.collection("comments").add({
+            nickname: nick,
+            content: text,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('cmt-nick').value = '';
+        document.getElementById('cmt-text').value = '';
+    } catch (e) {
+        alert("댓글 저장에 실패했습니다. 보안 규칙을 확인하세요.");
+    }
 }
 
 function loadComments() {
-    db.collection("comments").orderBy("timestamp", "desc").limit(30).onSnapshot((snapshot) => {
-        const list = document.getElementById('comment-list');
-        list.innerHTML = '';
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            const item = document.createElement('div');
-            item.className = 'comment-item';
-            item.innerHTML = `<div class="comment-meta">${data.nickname}</div><div class="comment-body">${data.content}</div>`;
-            list.appendChild(item);
+    try {
+        db.collection("comments").orderBy("timestamp", "desc").limit(30).onSnapshot((snapshot) => {
+            const list = document.getElementById('comment-list');
+            list.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `<div class="comment-meta">${data.nickname}</div><div class="comment-body">${data.content}</div>`;
+                list.appendChild(item);
+            });
+        }, (error) => {
+            console.error("댓글 로딩 오류:", error);
         });
-    });
+    } catch (e) { console.error("댓글 리스너 오류:", e); }
 }
 
 function saveResultImage() {
