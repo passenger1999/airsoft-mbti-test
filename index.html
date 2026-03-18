@@ -12,81 +12,77 @@
         .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease; }
         h1 { font-size: 0.9rem; text-align: center; color: #666; letter-spacing: 2px; margin-bottom: 10px; }
-        .visitor-count { text-align: center; font-size: 0.75rem; color: #555; margin-bottom: 20px; }
         .q-text { font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; text-align: center; word-break: keep-all; min-height: 3.5em; display: flex; align-items: center; justify-content: center; }
-        .btn-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
-        button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; opacity: 1; }
-        button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
+        .btn-grid { display: flex; flex-direction: column; gap: 20px; }
         
-        /* 통계 및 댓글 섹션 */
-        .section-title { font-size: 0.9rem; font-weight: 800; margin: 20px 0 10px 0; color: #666; border-top: 1px solid #333; padding-top: 15px; }
-        .stats-box { background: #222; border-radius: 12px; padding: 12px; margin-bottom: 20px; }
-        .stat-row { margin-bottom: 8px; }
-        .stat-label { font-size: 0.75rem; display: flex; justify-content: space-between; margin-bottom: 30px; }
-        .stat-bar-bg { background: #333; height: 6px; border-radius: 3px; position: relative; top: -25px; }
-        .stat-bar-fill { background: var(--accent-color); height: 100%; width: 0%; border-radius: 3px; transition: width 0.8s ease; }
+        /* 선택지 보드 스타일 */
+        .option-card { background: #222; border-radius: 16px; border: 1px solid #333; overflow: hidden; transition: transform 0.2s; animation: slideIn 0.4s ease forwards; opacity: 0; }
+        .option-card:hover { border-color: var(--accent-color); }
+        
+        button.opt-btn { width: 100%; background: var(--btn-bg); border: none; color: #eee; padding: 18px 20px; cursor: pointer; font-size: 1rem; transition: all 0.2s; font-weight: 600; text-align: left; }
+        button.opt-btn:hover { background: #333; color: var(--accent-color); }
+        
+        /* 통계 영역 */
+        .stat-bar { padding: 6px 15px; background: #111; font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; border-top: 1px solid #2a2a2a; }
+        .stat-bar b { color: var(--accent-color); }
 
-        .comment-section { margin-top: 10px; }
-        .comment-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-        .comment-input { background: #2a2a2a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.8rem; }
-        .comment-area { grid-column: span 2; min-height: 40px; resize: none; }
-        .comment-submit { grid-column: span 2; background: #333; color: #888; border: none; padding: 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; text-align: center; }
-        .comment-submit:hover { background: var(--accent-color); color: #fff; }
-        .comment-list { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; }
-        .comment-item { background: #1f1f1f; padding: 10px; border-radius: 8px; color: #aaa; }
-        .comment-meta { font-weight: bold; color: #777; margin-bottom: 3px; font-size: 0.7rem; }
+        /* 댓글 영역 */
+        .comment-area { padding: 12px 15px; background: #181818; border-top: 1px solid #2a2a2a; }
+        .comment-list { max-height: 70px; overflow-y: auto; margin-bottom: 10px; font-size: 0.8rem; color: #aaa; }
+        .comment-item { margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px dashed #333; display: flex; gap: 5px; }
+        .comment-item span { color: #666; font-size: 0.7rem; }
+        
+        .comment-form { display: grid; grid-template-columns: 80px 80px 1fr 50px; gap: 5px; }
+        .comment-form input { background: #252525; border: 1px solid #444; color: #fff; padding: 5px; font-size: 0.75rem; border-radius: 4px; outline: none; }
+        .comment-form input:focus { border-color: var(--accent-color); }
+        .comment-form button { background: var(--accent-color); border: none; color: white; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+        
+        .reliability-info { text-align: center; font-size: 0.7rem; color: #444; margin-top: 15px; }
 
+        /* 기존 결과창 스타일 */
         .final-area { display: none; }
         #capture-area { padding: 15px; background: var(--card-bg); border-radius: 15px; }
         .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
-        .user-title { font-size: 2.1rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; color: #fff; }
+        .user-title { font-size: 2.1rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; word-break: keep-all; color: #fff; }
         .analysis-box { background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
-        .advice-card { padding: 20px; background: #251010; border-radius: 15px; color: #ff8888; border-left: 5px solid var(--accent-color); }
+        .analysis-item { font-size: 0.95rem; color: #ccc; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
+        .analysis-item b { color: var(--accent-color); white-space: nowrap; }
+        .advice-card { padding: 20px; background: #251010; border-radius: 15px; color: #ff8888; font-size: 1rem; border-left: 5px solid var(--accent-color); position: relative; overflow: hidden; }
+        .advice-card::before { content: "ADVICE"; position: absolute; top: -5px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.05; }
         .share-group { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; }
         .primary { background: var(--accent-color); color: white; }
         .secondary { background: #444; color: white; }
+        .full { background: #3b5998; color: white; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>에어소프트 취향 분석기 V3.2</h1>
-    <div id="visitor-ui" class="visitor-count">데이터 신뢰도: <span id="total-participants">0</span>명의 분석 데이터 누적됨</div>
     <div class="progress-container"><div id="progress-fill"></div></div>
     
     <div id="test-area">
-        <p id="question" class="q-text">분석 프로토콜을 가동하시겠습니까?</p>
+        <p id="question" class="q-text">분석을 시작하시겠습니까?</p>
         <div id="options" class="btn-grid">
-            <button onclick="startTest()" style="text-align: center;">[ 분석 시작 ]</button>
-        </div>
-
-        <div id="step-addon" style="display:none;">
-            <div class="section-title">📊 이 질문의 실시간 선택 분포</div>
-            <div id="step-stats" class="stats-box"></div>
-
-            <div class="section-title">💬 이 단계의 의견</div>
-            <div class="comment-section">
-                <div class="comment-form">
-                    <input type="text" id="nick" class="comment-input" placeholder="닉네임">
-                    <input type="password" id="pw" class="comment-input" placeholder="비번">
-                    <textarea id="msg" class="comment-input comment-area" placeholder="내 의견 적기..."></textarea>
-                    <button onclick="addComment()" class="comment-submit">의견 등록</button>
-                </div>
-                <div id="comment-list" class="comment-list"></div>
-            </div>
+            <button onclick="startTest()" style="text-align: center; opacity:1; animation:none; border-radius:14px; background:var(--btn-bg); color:white; padding:16px; border:1px solid #333; cursor:pointer;">[ 분 석 시 작 ]</button>
         </div>
     </div>
 
     <div id="result-area" class="final-area">
         <div id="capture-area">
             <div id="type-code" class="type-badge">TYPE: UNKNOWN</div>
-            <h2 class="user-title" id="final-title">분석 완료</h2>
+            <h2 class="user-title" id="final-title">분석 중...</h2>
             <div class="analysis-box" id="final-desc"></div>
             <div class="advice-card" id="final-advice"></div>
         </div>
         <div class="share-group">
-            <button onclick="saveResultImage()" class="share-btn primary">결과 이미지 저장</button>
+            <div class="btn-row">
+                <button onclick="saveResultImage()" class="share-btn primary">결과 이미지 저장</button>
+                <button onclick="shareLink()" class="share-btn full">결과 공유하기</button>
+            </div>
             <button onclick="location.href=location.pathname" class="share-btn secondary">다시 테스트</button>
         </div>
     </div>
@@ -94,138 +90,186 @@
 
 <script>
 const questions = [
-    { id: "origin", q: "당신을 전율케 하는 총기의 혈통은?", o: {U:"천조국 [미제]", R:"불곰국 [빨갱이]", K:"[국산] K-시리즈", E:"정교한 [유럽산]"} },
+    { id: "origin", q: "당신을 전율케 하는 총기의 혈통은?", o: {U:"천조국 [미제]", R:"불곰국 [빨갱이]", K:"[국내산] 제철 K-시리즈", E:"정교한 [유럽산] 엔지니어링"} },
     { id: "class", q: "단 한 정의 장비만 챙겨야 한다면?", o: {A:"돌격소총(AR)", S:"기관단총(SMG)", B:"저격소총(Sniper)", G:"샷건/기관총"} },
     { id: "power", q: "절대 타협할 수 없는 구동 방식은?", o: {G:"가스/HPA (반동파)", E:"전동건 (효율파)", S:"탄피배출 (피젯토이단)", M:"에어코킹 (환경보호가)"} },
-    { id: "place", q: "당신의 주된 서식지는 어디인가?", o: {G:"[게임 필드]", S:"[슈팅 매치]", B:"[방구석 슈터]", C:"[컬렉터]"} }
-]; // 가독성을 위해 질문 4개로 예시 구성 (전체 추가 가능)
+    { id: "place", q: "당신의 주된 서식지는 어디인가?", o: {G:"[서바이벌 게임 필드]", S:"[슈팅 매치/스틸 챌린지]", B:"[침대 위 방구석 슈터]", C:"[컬렉터]"} },
+    { id: "optic", q: "현재 장착된 옵션의 실체는?", o: {O:"[오리지널] 실물", R:"가성비 [레플리카]", H:"중요 부위만 실물인 [하이브리드]", N:"아무것도 안 올린 [순정]"} },
+    { id: "style", q: "추구하는 장비의 외형적 미학은?", o: {T:"백화점 [택티컬]", O:"낭만의 [올드스쿨]", M:"최소한의 [미니멀리즘]", S:"[기능우선주의]"} },
+    { id: "money", q: "당신의 평소 소비 상태는?", o: {I:"대책 없는 [충동구매]", P:"치밀한 [계획소비]", S:"[일단 훔치기]", R:"[중고장터 매복팀]"} },
+    { id: "aim", q: "조준경에 대한 당신의 철학은?", o: {V:"[레드도트 사이트]", N:"[아이언 사이트]", L:"[야동 사이트]", M:"[배율 스코프]"} },
+    { id: "care", q: "장비 관리 상태를 한마디로?", o: {S:"기스 하나 없는 [신품급]", W:"일부러 긁는 [웨더링]", O:"세월이 만든 [빈티지]", D:"격발만 되면 [장땡]"} },
+    { id: "end", q: "에어소프트 취미의 끝은 무엇인가?", o: {R:"[외형]", P:"[집탄]", E:"[내구]", H:"[반동]"} }
+];
+
+const specialTitles = [
+    { condition: (c) => c[0]==='K' && c[5]==='O', title: "국방부 고증 5분 대기조" },
+    { condition: (c) => c[0]==='R' && c[6]==='S', title: "러시아 장비 훔쳐다 파는 간첩" },
+    { condition: (c) => c[0]==='U' && c[4]==='O', title: "트럼프 똥꼬 닦개" },
+    { condition: (c) => c[2]==='G' && c[3]==='G', title: "가스 반동에 뇌수 흘리는 광인" },
+    { condition: (c) => c[2]==='G' && c[9]==='H', title: "뇌 흔들리는 반동에 중독된 가스 중독자" },
+    { condition: (c) => c[2]==='S' && c[3]==='G', title: "필드에서 탄피 줍는 이삭 줍는 여인" },
+    { condition: (c) => c[2]==='S' && c[9]==='H', title: "탄피 반동에 전립선 자극받는 변태" },
+    { condition: (c) => c[3]==='B' && c[7]==='M', title: "유튜브로 사격 배운 방구석 데브그루" },
+    { condition: (c) => c[4]==='N' && c[7]==='N', title: "순정에 미친 광기의 미니멀리스트" },
+    { condition: (c) => c[4]==='O' && c[6]==='I', title: "카드값보다 렌즈가 소중한 파산자" },
+    { condition: (c) => c[6]==='I' && c[4]==='O', title: "카드값보다 렌즈 투과율이 소중한 파산자" },
+    { condition: (c) => c[6]==='R' && c[8]==='D', title: "중고장터의 하이에나" },
+    { condition: (c) => c[6]==='S' && c[7]==='L', title: "총 훔쳐서 야동 보는 사회부적응자" },
+    { condition: (c) => c[6]==='R' && c[4]==='R', title: "남이 쓰다 버린 쓰레기 줍는 하이에나" },
+    { condition: (c) => c[6]==='S', title: "필드의 대도(大盜)" },
+    { condition: (c) => c[7]==='L', title: "야동 확대범" },
+    { condition: (c) => c[7]==='L' && c[3]==='B', title: "조준경으로 야동 보며 딸치는 방구석 특수부대" },
+    { condition: (c) => c[8]==='S' && c[3]==='C', title: "기스 날까 봐 박스에만 모시는 상전님" },
+    { condition: (c) => c[9]==='P' && c[7]==='M', title: "타겟지에 구멍 하나만 뚫으려는 결벽증 요원" }
+];
 
 const fragments = {
-    origin: { U: "미제 앞잡이고", R: "빨갱이고", K: "K-짬내 진동하는", E: "콧대 높은 유럽산" },
-    power: { G: "프로판 중독", E: "윙탁이", S: "탄피 수집광", M: "환경운동가" },
-    place: { G: "필드의 전사", S: "매치 슈터", B: "방구석 요원", C: "박물관장" }
+    origin: { U: "미제 앞잡이고", R: "빨갱이고", K: "K-짬내 진동하는 총을 굳이 사고", E: "콧대 높은 유럽산을 애용하고" },
+    power: { G: "프로판 붙들고 사는", E: "윙탁거리는", S: "탄피에 집착하는", M: "돈이 없는" },
+    place: { G: "게이머", S: "자칭 사격선수", B: "방구석 델타포스", C: "소믈리에" }
 };
 
-let currentStep = 0;
 let responses = [];
 
-// 초기 방문자 수 로드
-document.getElementById('total-participants').innerText = localStorage.getItem('total_runs') || "1,240";
+// --- 데이터 엔진 ---
+const getDB = (qId, key) => JSON.parse(localStorage.getItem(`airsoft_${qId}_${key}`) || '{"count":0, "comments":[]}');
+const setDB = (qId, key, data) => localStorage.setItem(`airsoft_${qId}_${key}`, JSON.stringify(data));
+const getGlobalVisits = () => parseInt(localStorage.getItem('airsoft_total_v') || '0');
+const addGlobalVisit = () => localStorage.setItem('airsoft_total_v', getGlobalVisits() + 1);
 
 function startTest() {
-    currentStep = 0;
+    addGlobalVisit();
     responses = [];
-    document.getElementById('step-addon').style.display = 'block';
-    renderQuestion();
+    renderQuestion(0);
 }
 
-function renderQuestion() {
-    const q = questions[currentStep];
-    const progress = (currentStep / questions.length) * 100;
+function renderQuestion(step) {
+    const progress = (step / questions.length) * 100;
     document.getElementById('progress-fill').style.width = `${progress}%`;
+    const q = questions[step];
     document.getElementById('question').innerText = q.q;
-    
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
     
-    Object.entries(q.o).forEach(([key, value]) => {
+    const totalV = getGlobalVisits() || 1;
+
+    Object.entries(q.o).forEach(([key, value], index) => {
+        const db = getDB(q.id, key);
+        const ratio = ((db.count / totalV) * 100).toFixed(1);
+
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.style.animationDelay = `${index * 0.1}s`;
+
+        // 버튼부
         const btn = document.createElement('button');
+        btn.className = 'opt-btn';
         btn.innerText = value;
         btn.onclick = () => {
+            db.count++;
+            setDB(q.id, key, db);
             responses.push(key);
-            saveStepData(q.id, key); // 통계 저장
-            if (currentStep + 1 < questions.length) {
-                currentStep++;
-                renderQuestion();
-            } else {
-                showResult();
-            }
+            if (step + 1 < questions.length) renderQuestion(step + 1);
+            else showResult();
         };
-        optionsDiv.appendChild(btn);
-    });
 
-    loadStepStats(q.id);
-    loadStepComments(q.id);
-}
+        // 통계부
+        const stat = document.createElement('div');
+        stat.className = 'stat-bar';
+        stat.innerHTML = `<span>지난 유저 선택: <b>${db.count}</b>회</span> <span>통계 신뢰도: <b>${ratio}%</b></span>`;
 
-// [통계] 단계별 데이터 저장 및 로드
-function saveStepData(qId, selectedKey) {
-    let stats = JSON.parse(localStorage.getItem(`stats_${qId}`)) || {};
-    stats[selectedKey] = (stats[selectedKey] || 0) + 1;
-    localStorage.setItem(`stats_${qId}`, JSON.stringify(stats));
-}
+        // 댓글부
+        const comm = document.createElement('div');
+        comm.className = 'comment-area';
+        const cList = document.createElement('div');
+        cList.className = 'comment-list';
+        db.comments.slice(-5).forEach(c => {
+            cList.innerHTML += `<div class="comment-item"><b>${c.u}</b>: ${c.t}</div>`;
+        });
+        if(db.comments.length === 0) cList.innerHTML = '<div style="font-size:0.7rem; color:#444;">첫 댓글을 남겨보세요.</div>';
 
-function loadStepStats(qId) {
-    const stats = JSON.parse(localStorage.getItem(`stats_${qId}`)) || {};
-    const total = Object.values(stats).reduce((a, b) => a + b, 0) || 1;
-    const q = questions[currentStep];
-    
-    const target = document.getElementById('step-stats');
-    target.innerHTML = '';
-
-    Object.entries(q.o).forEach(([key, name]) => {
-        const count = stats[key] || 0;
-        const percent = Math.round((count / total) * 100);
-        target.innerHTML += `
-            <div class="stat-row">
-                <div class="stat-label"><span>${name}</span><span>${percent}%</span></div>
-                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${percent}%"></div></div>
-            </div>
+        const cForm = document.createElement('div');
+        cForm.className = 'comment-form';
+        cForm.innerHTML = `
+            <input type="text" placeholder="작성자" id="u-${q.id}-${key}">
+            <input type="password" placeholder="비번" id="p-${q.id}-${key}">
+            <input type="text" placeholder="한줄평" id="t-${q.id}-${key}">
+            <button onclick="saveComment('${q.id}', '${key}', ${step})">등록</button>
         `;
+
+        comm.appendChild(cList);
+        comm.appendChild(cForm);
+        card.appendChild(btn);
+        card.appendChild(stat);
+        card.appendChild(comm);
+        optionsDiv.appendChild(card);
     });
+
+    const info = document.createElement('div');
+    info.className = 'reliability-info';
+    info.innerText = `현재까지 총 ${totalV}명이 이 질문을 거쳐갔습니다.`;
+    optionsDiv.appendChild(info);
 }
 
-// [댓글] 단계별 댓글 기능
-function addComment() {
-    const qId = questions[currentStep].id;
-    const nick = document.getElementById('nick').value;
-    const msg = document.getElementById('msg').value;
+function saveComment(qId, key, step) {
+    const u = document.getElementById(`u-${qId}-${key}`).value;
+    const t = document.getElementById(`t-${qId}-${key}`).value;
+    if(!u || !t) return alert("작성자와 내용을 입력해주세요!");
 
-    if(!nick || !msg) return;
-
-    const comment = { nick, msg, date: new Date().toLocaleTimeString() };
-    let comments = JSON.parse(localStorage.getItem(`comments_${qId}`)) || [];
-    comments.unshift(comment);
-    localStorage.setItem(`comments_${qId}`, JSON.stringify(comments));
-
-    document.getElementById('msg').value = '';
-    loadStepComments(qId);
-}
-
-function loadStepComments(qId) {
-    const comments = JSON.parse(localStorage.getItem(`comments_${qId}`)) || [];
-    const target = document.getElementById('comment-list');
-    target.innerHTML = comments.map(c => `
-        <div class="comment-item">
-            <div class="comment-meta">${c.nick} (${c.date})</div>
-            <div>${c.msg}</div>
-        </div>
-    `).join('');
+    const db = getDB(qId, key);
+    db.comments.push({ u, t });
+    setDB(qId, key, db);
+    renderQuestion(step); // 즉시 갱신
 }
 
 function showResult() {
-    // 총 방문자 수 증가
-    let runs = parseInt(localStorage.getItem('total_runs') || "1240");
-    localStorage.setItem('total_runs', runs + 1);
-
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('result-area').style.display = 'block';
-    
     const code = responses;
     document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
-    document.getElementById('final-title').innerText = `${fragments.origin[code[0]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
-    document.getElementById('final-desc').innerHTML = `분석 결과 당신은 ${questions[0].o[code[0]]} 계열의 장비를 선호하며, ${questions[2].o[code[2]]} 방식을 고수하는 유저입니다.`;
-    document.getElementById('final-advice').innerText = "💡 조언: 장비는 거들 뿐, 결국 중요한 건 당신의 실력입니다.";
+
+    let fTitle = `${fragments.origin[code[0]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
+    for (const sp of specialTitles) {
+        if (sp.condition(code)) { fTitle = sp.title; break; }
+    }
+    document.getElementById('final-title').innerText = fTitle;
+
+    document.getElementById('final-desc').innerHTML = `
+        <div class="analysis-item"><b>취향:</b> ${questions[0].o[code[0]]} / ${questions[5].o[code[5]]}</div>
+        <div class="analysis-item"><b>성향:</b> ${questions[3].o[code[3]]} 에서 ${questions[7].o[code[7]]} 애용</div>
+        <div class="analysis-item"><b>소비:</b> ${questions[6].o[code[6]]} (으)로 ${questions[4].o[code[4]]} 구매</div>
+    `;
+
+    let advice = "💡 조언: ";
+    if(code[6]==='S') advice += "남의 장비 훔치지 말고 성실하게 사세요. 은팔찌 차고 싶습니까?";
+    else if(code[7]==='L') advice += "조준경으로 표적을 보세요. 야동 보라고 있는 거 아닙니다.";
+    else if(code[0]==='K') advice += "K-시리즈 고증은 PTSD입니다. 적당히 하세요.";
+    else if(code[3]==='B') advice += "총은 죄가 없습니다. 당신의 뱃살과 귀찮음이 죄입니다.";
+    else if(code[8]==='S') advice += "기스 무서우면 그냥 박스에 가둬두세요. 그게 총입니까, 상전입니까?";
+    else advice += "장비 탓하기 전에 사격장 가서 연습이나 더 하세요.";
+    
+    document.getElementById('final-advice').innerText = advice;
 }
 
 function saveResultImage() {
     const area = document.getElementById('capture-area');
     html2canvas(area, { backgroundColor: '#1a1a1a', scale: 2 }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `airsoft-result.png`;
-        link.href = canvas.toDataURL();
+        link.download = `airsoft-result-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
         link.click();
     });
+}
+
+function shareLink() {
+    const title = document.getElementById('final-title').innerText;
+    const text = `나의 에어소프트 유형은: [${title}]! 지금 확인해보세요.`;
+    if (navigator.share) {
+        navigator.share({ title: '에어소프트 취향 분석기', text: text, url: window.location.href });
+    } else {
+        alert("이 브라우저는 공유 기능을 지원하지 않습니다. 결과를 캡처해서 공유해주세요!");
+    }
 }
 </script>
 </body>
