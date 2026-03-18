@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-ASTI 3.5 판독 시스템</title>
+    <title>에어소프트 취향 분석기 V3.2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #0f0f0f; --card-bg: #1a1a1a; --btn-bg: #2a2a2a; }
         body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; }
@@ -33,9 +34,12 @@
         .advice-card::before { content: "ADVICE"; position: absolute; top: -5px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.05; }
         
         .share-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px; }
-        .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; opacity: 1; animation: none; }
+        .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; }
         .primary { background: var(--accent-color); color: white; }
         .secondary { background: #444; color: white; }
+
+        /* 이미지 캡처를 위한 타겟 영역 설정 */
+        #capture-target { padding: 10px; background: var(--card-bg); border-radius: 20px; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -43,25 +47,27 @@
 <body>
 
 <div class="container">
-    <h1>A-ASTI PSYCHOLOGICAL SCANNER</h1>
+    <h1>에어소프트 취향 분석기 V3.2</h1>
     <div class="progress-container"><div id="progress-fill"></div></div>
     
     <div id="test-area">
-        <p id="question" class="q-text">데이터 동기화 완료. 스캔을 시작하시겠습니까?</p>
+        <p id="question" class="q-text">분석을 시작하시겠습니까?</p>
         <div id="options" class="btn-grid">
-            <button onclick="startTest()" style="text-align: center;">[ 시스템 가동 ]</button>
+            <button onclick="startTest()" style="text-align: center; opacity: 1; animation: none;">[ 분 석 ]</button>
         </div>
     </div>
 
     <div id="result-area" class="final-area">
-        <div id="type-code" class="type-badge">TYPE: UNKNOWN</div>
-        <h2 class="user-title" id="final-title">분석 중...</h2>
-        
-        <div class="analysis-box" id="final-desc"></div>
-        <div class="advice-card" id="final-advice"></div>
+        <div id="capture-target">
+            <div id="type-code" class="type-badge">TYPE: UNKNOWN</div>
+            <h2 class="user-title" id="final-title">분석 중...</h2>
+            
+            <div class="analysis-box" id="final-desc"></div>
+            <div class="advice-card" id="final-advice"></div>
+        </div>
         
         <div class="share-group">
-            <button onclick="shareResult()" class="share-btn primary">결과 공유하기</button>
+            <button onclick="downloadResult()" class="share-btn primary">이미지로 저장</button>
             <button onclick="location.href=location.pathname" class="share-btn secondary">다시 테스트</button>
         </div>
     </div>
@@ -70,7 +76,7 @@
 <script>
 const questions = [
     { id: "origin", q: "당신을 전율케 하는 총기의 혈통은?", o: {U:"천조국 미제", R:"불곰국 빨갱이", K:"국내산 제철 K-시리즈", E:"정교한 유럽산 엔지니어링"} },
-    { id: "class", q: "단 한 정의 장비만 챙겨야 한다면?", o: {A:"돌격소총(AR/AK)", S:"기관단총(SMG)", B:"저격소총(Sniper)", G:"샷건/기관총"} },
+    { id: "class", q: "단 한 정의 장비만 챙겨야 한다면?", o: {A:"돌격소총(AR)", S:"기관단총(SMG)", B:"저격소총(Sniper)", G:"샷건/기관총"} },
     { id: "power", q: "절대 타협할 수 없는 구동 방식은?", o: {G:"가스/HPA (반동파)", E:"전동건 (효율파)", S:"탄피배출 (피젯토이단)", M:"에어코킹 (환경보호가)"} },
     { id: "place", q: "당신의 주된 서식지는 어디인가?", o: {G:"서바이벌 게임 필드", S:"슈팅 매치/스틸 챌린지", B:"침대 위 방구석 슈터", C:"컬렉터"} },
     { id: "optic", q: "현재 장착된 옵션의 실체는?", o: {O:"오리지널 실물", R:"가성비 레플리카", H:"중요 부위만 실물인 하이브리드", N:"아무것도 안 올린 순정"} },
@@ -78,11 +84,12 @@ const questions = [
     { id: "money", q: "당신의 평소 소비 상태는?", o: {I:"대책 없는 충동구매", P:"장바구니 넣다 뺐다 계획소비", S:"일단 훔치기", R:"중고장터 매복팀"} },
     { id: "aim", q: "조준경에 대한 당신의 철학은?", o: {V:"레드도트 사이트", N:"아이언 사이트", L:"야동 사이트", M:"배율 스코프"} },
     { id: "care", q: "장비 관리 상태를 한마디로?", o: {S:"기스 하나 없는 신품급", W:"일부러 긁는 웨더링", O:"세월이 만든 빈티지", D:"격발만 되면 장땡"} },
-    { id: "end", q: "에어소프트 취미의 끝은 무엇인가?", o: {R:"지독한 리얼리즘", P:"극한의 집탄과 탄도", E:"불멸의 내구성", H:"어깨 박살 내는 반동"} }
-
+    { id: "end", q: "에어소프트 취미의 끝은 무엇인가?", o: {R:"외형/성능 리얼리즘", P:"집탄", E:"내구", H:"반동"} }
 ];
 
 const specialTitles = [
+    { condition: (c) => c[0]==='K', title: "국방부 5분 대기조" }, // K-시리즈 선택 시
+    { condition: (c) => c[9]==='P', title: "탄착군 결벽증 환자" }, // 집탄 중시
     { condition: (c) => c[0]==='U' && c[4]==='O', title: "트럼프 똥꼬 닦개" },
     { condition: (c) => c[2]==='S' && c[6]==='R', title: "탄피 줍다 장터로 런하는 낭만파" },
     { condition: (c) => c[3]==='B' && c[7]==='M', title: "방구석 데브그루" },
@@ -98,15 +105,6 @@ const fragments = {
 };
 
 let responses = [];
-
-window.onload = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const resultData = urlParams.get('r');
-    if (resultData && resultData.length === 10) {
-        responses = resultData.split('');
-        showResult();
-    }
-};
 
 function startTest() {
     responses = [];
@@ -140,15 +138,11 @@ function showResult() {
     document.getElementById('progress-fill').style.width = `100%`;
 
     const code = responses;
-    const typeCode = code.join('');
-    document.getElementById('type-code').innerText = `TYPE: ${typeCode}`;
+    document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
 
     let fTitle = `${fragments.money[code[6]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
     for (const sp of specialTitles) {
-        if (sp.condition(code)) {
-            fTitle = sp.title;
-            break;
-        }
+        if (sp.condition(code)) { fTitle = sp.title; break; }
     }
     document.getElementById('final-title').innerText = fTitle;
 
@@ -159,22 +153,29 @@ function showResult() {
     `;
 
     let advice = "💡 조언: ";
-    if(code[6]==='I' && code[4]==='O') advice += "오리 광학 살 돈으로 부모님 내복이나 사드리세요. 통장이 울고 있습니다.";
+    if(code[0]==='K') advice += "군대 다시 가는 꿈 꾸기 싫으면 적당히 하세요. K-시리즈는 고증이 아니라 PTSD입니다.";
+    else if(code[9]==='P') advice += "탄착군 안 나오면 총 탓하기 전에 영점부터 잡으세요. 문제는 언제나 총구 뒤에 있습니다.";
+    else if(code[6]==='I' && code[4]==='O') advice += "오리 광학 살 돈으로 부모님 내복이나 사드리세요. 통장이 울고 있습니다.";
     else if(code[2]==='S') advice += "탄피 줍는 모습이 꼭 이삭 줍는 여인 같네요.";
     else if(code[3]==='B') advice += "총은 죄가 없습니다. 당신을 방구석에 가둔 귀찮음이 죄일 뿐.";
     else if(code[8]==='S') advice += "기스 날까 봐 무서우면 에어캡에 싸서 보관만 하세요. 그게 총입니까, 상전입니까?";
-    else advice += "장비 탓하기 전에 사격장 가서 영점부터 다시 잡으세요. 문제는 언제나 총구 뒤에 있습니다.";
+    else advice += "장비 탓하기 전에 사격장 가서 연습이나 더 하세요. 실력이 장비를 못 따라가고 있습니다.";
+    
     document.getElementById('final-advice').innerText = advice;
 }
 
-function shareResult() {
-    const code = responses.join('');
-    const shareUrl = `${window.location.origin}${window.location.pathname}?r=${code}`;
-    if (navigator.share) {
-        navigator.share({ title: 'A-ASTI 판독 결과', text: `나의 에어소프트 성향은 [${document.getElementById('final-title').innerText}]!`, url: shareUrl });
-    } else {
-        navigator.clipboard.writeText(shareUrl).then(() => alert('공유 링크가 클립보드에 복사되었습니다!'));
-    }
+// 결과 영역을 이미지로 저장하는 함수
+function downloadResult() {
+    const target = document.getElementById('capture-target');
+    html2canvas(target, {
+        backgroundColor: '#1a1a1a',
+        scale: 2 // 화질 향상을 위해 배율 조정
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `airsoft-mbti-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
 }
 </script>
 </body>
