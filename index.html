@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* 기존 스타일 유지 */
         :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #0f0f0f; --card-bg: #1a1a1a; --btn-bg: #2a2a2a; }
         body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; touch-action: manipulation; }
         .container { width: 100%; max-width: 500px; margin: 20px auto; background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; box-sizing: border-box; }
@@ -22,16 +21,13 @@
         button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
         button:active { transform: scale(0.98); }
-        
         .stat-container { margin-top: 50px; padding-top: 20px; border-top: 1px solid #333; }
         .stat-title { font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center; font-weight: 600; }
         .stat-item { margin-bottom: 12px; }
         .stat-info { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; color: #aaa; }
         .stat-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
         .stat-fill { height: 100%; background: var(--accent-color); opacity: 0.6; transition: width 1s ease-out; width: 0; }
-
         .reliability-info { margin-top: 20px; font-size: 0.7rem; color: #555; text-align: center; }
-
         .comment-section { margin-top: 40px; border-top: 1px dashed #444; padding-top: 20px; }
         .comment-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .comment-input { background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
@@ -40,7 +36,6 @@
         .comment-item { background: #1f1f1f; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-bottom: 1px solid #2a2a2a; }
         .comment-meta { font-size: 0.75rem; color: var(--accent-color); margin-bottom: 5px; font-weight: 700; }
         .comment-body { font-size: 0.85rem; color: #bbb; }
-
         .final-area { display: none; }
         #capture-area { padding: 15px; background: var(--card-bg); border-radius: 15px; }
         .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 6px 16px; border-radius: 20px; font-size: 1.0rem; font-weight: 800; margin-bottom: 10px; }
@@ -84,7 +79,6 @@
             <button onclick="saveResultImage()" class="share-btn primary" style="opacity:1;">결과 이미지 저장</button>
             <button onclick="location.reload()" class="share-btn secondary" style="opacity:1;">다시 하기</button>
         </div>
-
         <div class="comment-section">
             <div class="comment-form">
                 <input type="text" id="cmt-nick" class="comment-input" placeholder="닉네임">
@@ -154,9 +148,8 @@ const fragments = {
 let responses = [];
 
 window.onload = () => {
-    const optionsDiv = document.getElementById('options');
+    document.getElementById('options').innerHTML = `<button onclick="startTest()" style="text-align: center; opacity:1;">[ 분 석 시 작 ]</button>`;
     document.getElementById('question').innerText = "분석을 시작하시겠습니까?";
-    optionsDiv.innerHTML = `<button onclick="startTest()" style="text-align: center; opacity:1;">[ 분 석 시 작 ]</button>`;
     loadComments();
 };
 
@@ -174,41 +167,53 @@ async function renderQuestion(step) {
     const optionsDiv = document.getElementById('options');
     const statList = document.getElementById('stat-list');
     optionsDiv.innerHTML = '';
-    statList.innerHTML = '통계 로딩 중...';
+    statList.innerHTML = '통계 데이터 갱신 중...';
 
+    // 1. 현재 질문에 대한 기존 통계 먼저 가져오기
     let statData = {};
-    let total = 1;
-
+    let total = 0;
     try {
-        const docRef = db.collection("stats").doc(q.id);
-        const doc = await docRef.get();
-        if (doc.exists) {
-            statData = doc.data();
-            total = Object.values(statData).reduce((a, b) => a + b, 0) || 1;
+        const snap = await db.collection("stats").doc(q.id).get();
+        if(snap.exists) {
+            statData = snap.data();
+            total = Object.values(statData).reduce((a, b) => a + b, 0);
         }
-    } catch (e) {
-        console.error("Firebase 통계 오류:", e);
-        statList.innerHTML = '통계 데이터를 불러올 수 없습니다.';
-    }
+    } catch(e) { console.error(e); }
 
-    statList.innerHTML = '';
+    // 2. 옵션 버튼 생성
     Object.entries(q.o).forEach(([key, value], index) => {
         const btn = document.createElement('button');
         btn.innerText = value;
         btn.style.animationDelay = `${index * 0.1}s`;
+        
+        // 클릭 이벤트: 저장 후 다음 단계로
         btn.onclick = async () => {
-            try {
-                await db.collection("stats").doc(q.id).set({ [key]: firebase.firestore.FieldValue.increment(1) }, { merge: true });
-            } catch (e) { console.error("데이터 저장 실패:", e); }
+            // 버튼 클릭 시 즉시 비활성화하여 중복 클릭 방지
+            const allBtns = optionsDiv.querySelectorAll('button');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
             
-            responses.push(key);
-            if (step + 1 < questions.length) renderQuestion(step + 1);
-            else showResult();
+            try {
+                // 서버에 데이터 반영 (완료될 때까지 await)
+                await db.collection("stats").doc(q.id).set({
+                    [key]: firebase.firestore.FieldValue.increment(1)
+                }, { merge: true });
+                
+                responses.push(key);
+                if (step + 1 < questions.length) renderQuestion(step + 1);
+                else showResult();
+            } catch (e) {
+                console.error("데이터 저장 실패:", e);
+                // 실패해도 흐름은 유지
+                responses.push(key);
+                if (step + 1 < questions.length) renderQuestion(step + 1);
+                else showResult();
+            }
         };
         optionsDiv.appendChild(btn);
 
+        // 3. 통계 그래프 그리기
         const count = statData[key] || 0;
-        const percent = Math.round((count / total) * 100);
+        const percent = total > 0 ? Math.round((count / total) * 100) : 0;
         const statItem = document.createElement('div');
         statItem.className = 'stat-item';
         statItem.innerHTML = `
@@ -251,7 +256,6 @@ async function addComment() {
     const nick = document.getElementById('cmt-nick').value;
     const text = document.getElementById('cmt-text').value;
     if(!nick || !text) return alert("내용을 입력해주세요.");
-
     try {
         await db.collection("comments").add({
             nickname: nick,
@@ -260,27 +264,21 @@ async function addComment() {
         });
         document.getElementById('cmt-nick').value = '';
         document.getElementById('cmt-text').value = '';
-    } catch (e) {
-        alert("댓글 저장에 실패했습니다. 보안 규칙을 확인하세요.");
-    }
+    } catch (e) { alert("댓글 저장 실패"); }
 }
 
 function loadComments() {
-    try {
-        db.collection("comments").orderBy("timestamp", "desc").limit(30).onSnapshot((snapshot) => {
-            const list = document.getElementById('comment-list');
-            list.innerHTML = '';
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const item = document.createElement('div');
-                item.className = 'comment-item';
-                item.innerHTML = `<div class="comment-meta">${data.nickname}</div><div class="comment-body">${data.content}</div>`;
-                list.appendChild(item);
-            });
-        }, (error) => {
-            console.error("댓글 로딩 오류:", error);
+    db.collection("comments").orderBy("timestamp", "desc").limit(30).onSnapshot((snapshot) => {
+        const list = document.getElementById('comment-list');
+        list.innerHTML = '';
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<div class="comment-meta">${data.nickname}</div><div class="comment-body">${data.content}</div>`;
+            list.appendChild(item);
         });
-    } catch (e) { console.error("댓글 리스너 오류:", e); }
+    });
 }
 
 function saveResultImage() {
