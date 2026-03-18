@@ -21,6 +21,21 @@
         button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
         button:active { transform: scale(0.98); }
+        
+        /* 경고창 스타일 추가 */
+        .disclaimer-box {
+            background: rgba(255, 51, 0, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #ff8888;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+        .disclaimer-box b { color: var(--accent-color); display: block; margin-bottom: 5px; font-size: 0.95rem; }
+
         .stat-container { margin-top: 50px; padding-top: 20px; border-top: 1px solid #333; }
         .stat-title { font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center; font-weight: 600; }
         .total-counter { text-align: center; font-size: 0.85rem; color: var(--accent-color); margin-bottom: 20px; font-weight: 700; background: rgba(255,51,0,0.1); padding: 8px; border-radius: 8px; }
@@ -150,17 +165,26 @@ const specialTitles = [
     { condition: (c) => c[9]==='P' && c[2]==='M', title: "사격선수" }
 ];
 
-const fragments = {
-    origin: { U: "미제 앞잡이고", R: "빨갱이고", K: "K-짬내 진동하는 총을 사고", E: "콧대 높은 유럽산을 애용하고" },
-    power: { G: "프로판 붙들고 사는", E: "윙탁거리는", S: "탄피에 집착하는", M: "돈이 없는" },
-    place: { G: "게이머", S: "자칭 사격선수", B: "방구석 델타포스", C: "소믈리에" }
-};
-
 let responses = [];
 
 window.onload = () => {
-    document.getElementById('options').innerHTML = `<button onclick="startTest()" style="text-align: center; opacity:1;">[ 분 석 시 작 ]</button>`;
-    document.getElementById('question').innerText = "분석을 시작하시겠습니까?";
+    // 시작 화면 구성: 경고 문구와 시작 버튼 결합
+    const optionsDiv = document.getElementById('options');
+    const questionP = document.getElementById('question');
+    
+    questionP.innerText = "분석을 시작하시겠습니까?";
+    
+    optionsDiv.innerHTML = `
+        <div class="disclaimer-box">
+            <b>⚠️ 주의사항 (Disclaimer)</b>
+            본 분석기에서 출력되는 결과와 조언은 오로지 <b>풍자와 재미</b>를 목적으로 작성되었습니다. 
+            내용 실제 인물, 단체, 사실과는 전혀 무관하며 에어소프트 커뮤니티 내부의 밈(Meme)을 활용한 농담을 포함하고 있습니다.
+            <br><br>
+            다소 거칠거나 불쾌할 수 있는 표현을 원치 않으신다면 분석을 진행하지 마시기 바랍니다.
+        </div>
+        <button onclick="startTest()" style="text-align: center; opacity:1;">[ 모든 내용을 확인했으며 분석 시작 ]</button>
+    `;
+    
     loadComments();
     updateTotalUsersDisplay();
 };
@@ -247,7 +271,6 @@ function showResult() {
     const code = responses;
     document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
 
-    // 호칭 결정: 만족하는 모든 조건을 찾아 랜덤 선택
     let candidates = specialTitles.filter(sp => sp.condition(code)).map(sp => sp.title);
     let fTitle = candidates.length > 0 
         ? candidates[Math.floor(Math.random() * candidates.length)] 
@@ -261,7 +284,6 @@ function showResult() {
         <div class="analysis-item"><b>소비:</b> ${questions[6].o[code[6]]} (으)로 ${questions[4].o[code[4]]} 구매</div>
     `;
 
-    // 조언 결정: 만족하는 조언들을 리스트에 담아 랜덤 선택
     let adviceList = [];
     if(code[6]==='S') adviceList.push("해병식 전술적 위치 이동은 사회에서 불법이라는 사실 알고계신가요?");
     if(code[7]==='L') adviceList.push("조준경으로 표적을 보세요. 야동 보라고 있는 거 아닙니다.");
