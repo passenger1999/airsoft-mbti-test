@@ -125,27 +125,19 @@ const specialTitles = [
     { condition: (c) => c[0]==='K' && c[4]==='O', title: "국방부 고증 5분 대기조" },
     { condition: (c) => c[0]==='E' && c[4]==='N', title: "순정 그 자체를 사랑하는 자" },
     { condition: (c) => c[1]==='A' && c[5]==='T', title: "AR 상단 레일에 개장한 백화점 점장" },
-    
-    
     { condition: (c) => c[1]==='G' && c[9]==='H', title: "환상종" },
-
-    
-    { condition: (c) => c[2]==='S' && c[3]==='G', title: "탄피 줍는 여인)" },
-    
+    { condition: (c) => c[2]==='S' && c[3]==='G', title: "탄피 줍는 여인" },
     { condition: (c) => c[3]==='G' && c[8]==='D', title: "진짜 게이머" },
     { condition: (c) => c[3]==='S' && c[7]==='N', title: "노장" },
-
     { condition: (c) => c[3]==='C' && c[8]==='S', title: "국건 사장" },
     { condition: (c) => c[4]==='O' && c[6]==='I', title: "부자" },
     { condition: (c) => c[4]==='R' && c[5]==='M', title: "뉴비" },
     { condition: (c) => c[4]==='N' && c[7]==='N', title: "고수" },
     { condition: (c) => c[4]==='H' && c[5]==='T', title: "실용주의자" },
     { condition: (c) => c[5]==='O' && c[8]==='O', title: "베트남전 참전용사" },
-
     { condition: (c) => c[5]==='M' && c[1]==='S', title: "미니멀리스트" },
     { condition: (c) => c[5]==='T' && c[4]==='O', title: "방구석 델타포스" },
     { condition: (c) => c[6]==='I' && c[9]==='R', title: "얼빠" },
-
     { condition: (c) => c[6]==='S', title: "대도(大盜) 쿠팡" },
     { condition: (c) => c[6]==='R' && c[8]==='D', title: "남이 쓰다 버린 쓰레기 줍는 하이에나" },
     { condition: (c) => c[6]==='S' && c[7]==='L', title: "총 훔쳐서 야동 보는 사회부적응자" },
@@ -154,14 +146,8 @@ const specialTitles = [
     { condition: (c) => c[7]==='L' && c[3]==='B', title: "옵틱으로 야동 보는 방구석 딸수부대" },
     { condition: (c) => c[7]==='N' && c[9]==='P', title: "2차대전 참전용사" },
     { condition: (c) => c[8]==='W' && c[5]==='O', title: "개척자" },
-
-
     { condition: (c) => c[8]==='O' && c[0]==='R', title: "서기장 동지" },
-
-    { condition: (c) => c[9]==='P' && c[2]==='M', title: "사격선수" },
-
-
-    { condition: (c) => true, title: "평범하기 짝이 없는 솦붕이 1호" } // 기본값
+    { condition: (c) => c[9]==='P' && c[2]==='M', title: "사격선수" }
 ];
 
 const fragments = {
@@ -191,14 +177,9 @@ async function startTest() {
     responses = [];
     document.getElementById('item-stats').style.display = 'block';
     
-    // 분석 시작 시 전체 방문자 수 1 증가
     try {
         const globalRef = db.collection("stats").doc("global");
-        try {
-            await globalRef.update({ total_users: firebase.firestore.FieldValue.increment(1) });
-        } catch(e) {
-            await globalRef.set({ total_users: 1 }, { merge: true });
-        }
+        await globalRef.set({ total_users: firebase.firestore.FieldValue.increment(1) }, { merge: true });
         updateTotalUsersDisplay();
     } catch(e) { console.error(e); }
 
@@ -236,11 +217,7 @@ async function renderQuestion(step) {
             
             try {
                 const docRef = db.collection("stats").doc(q.id);
-                try {
-                    await docRef.update({ [key]: firebase.firestore.FieldValue.increment(1) });
-                } catch (err) {
-                    await docRef.set({ [key]: 1 }, { merge: true });
-                }
+                await docRef.set({ [key]: firebase.firestore.FieldValue.increment(1) }, { merge: true });
                 responses.push(key);
                 if (step + 1 < questions.length) renderQuestion(step + 1);
                 else showResult();
@@ -270,10 +247,12 @@ function showResult() {
     const code = responses;
     document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
 
-    let fTitle = `${fragments.origin[code[0]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
-    for (const sp of specialTitles) {
-        if (sp.condition(code)) { fTitle = sp.title; break; }
-    }
+    // 호칭 결정: 만족하는 모든 조건을 찾아 랜덤 선택
+    let candidates = specialTitles.filter(sp => sp.condition(code)).map(sp => sp.title);
+    let fTitle = candidates.length > 0 
+        ? candidates[Math.floor(Math.random() * candidates.length)] 
+        : "평범하기 짝이 없는 솦붕이 1호";
+    
     document.getElementById('final-title').innerText = fTitle;
 
     document.getElementById('final-desc').innerHTML = `
@@ -282,35 +261,27 @@ function showResult() {
         <div class="analysis-item"><b>소비:</b> ${questions[6].o[code[6]]} (으)로 ${questions[4].o[code[4]]} 구매</div>
     `;
 
-    let advice = "💡 조언: ";
-    if(code[6]==='S') advice += "해병식 전술적 위치 이동은 사회에서 불법이라는 사실 알고계신가요?";
-    else if(code[7]==='L') advice += "조준경으로 표적을 보세요. 야동 보라고 있는 거 아닙니다.";
-    else if(code[0]==='K') advice += "K-시리즈 고증은 PTSD입니다. 적당히 하세요.";
-    else if(code[3]==='B') advice += "총은 죄가 없습니다. 당신의 뱃살과 귀찮음이 죄입니다.";
-    else if(code[8]==='S') advice += "기스 무서우면 아예 뽁뽁이로 싸세요. 그게 총입니까, 상전입니까?";
-    else if(c[3]==='B' && c[7]==='L') advice += "침대 위 방구석에서 무슨 사이트를 보신다고요?" }, 
-    let advice = "💡 조언: ";
- else if (code[2] === 'S' && code[3] === 'G') {
-        advice += "필드에서 탄피 배출식을 쓰다니... 게임은 안 하고 탄피 줍느라 엉덩이만 보여주실 타입이네요.";
-    } else if (code[4] === 'O' && code[6] === 'I') {
-        advice += "집은 월세여도 광학은 오리(Original)인 당신, 진정한 솦푸어입니다.";
-    else if (code[0] === 'K') {
-        advice += "K-시리즈 고증은 질병이자 PTSD입니다. 전역한 지가 언젠데 아직도 국방부 망령에 시달리시나요?";
-    } else if (code[3] === 'B') {
-        advice += "총은 죄가 없습니다. 죄가 있다면 당신의 무거운 엉덩이와 뱃살이 죄입니다.";
-    } else if (code[2] === 'M') {
-        advice += "에어코킹만 고집하는 당신, 환경보호가인가요? 가스건 한 번 맛보면 못 돌아옵니다.";
-    } else if (code[9] === 'H' && code[2] === 'G') {
-        advice += "가스 중독자시군요. 겨울철엔 라이터로 탄창 데우다가 손 데지 않게 조심하세요.";
-    } else if (code[5] === 'M' && code[1] === 'G') {
-        advice += "기관총에 미니멀리즘이라니...";
-    } else if (code[4] === 'N' && code[7] === 'N') {
-        advice += "광학도 없고 아이언 사이트만 고집하는 당신, 혹시 시력이 6.0인가요?";
-    } else if (code[6] === 'R' && code[8] === 'D') {
-        advice += "더치트 상주하며 중고장터만 매복하는 하이에나님, 그러다 사기꾼한테 '전술적 긴빠이' 당하니 조심하세요.";
-    
-    else advice += "장비 탓하기 전에 사격장 가서 연습이나 더 하세요.";
-    document.getElementById('final-advice').innerText = advice;
+    // 조언 결정: 만족하는 조언들을 리스트에 담아 랜덤 선택
+    let adviceList = [];
+    if(code[6]==='S') adviceList.push("해병식 전술적 위치 이동은 사회에서 불법이라는 사실 알고계신가요?");
+    if(code[7]==='L') adviceList.push("조준경으로 표적을 보세요. 야동 보라고 있는 거 아닙니다.");
+    if(code[0]==='K') adviceList.push("K-시리즈 고증은 질병이자 PTSD입니다. 전역한 지가 언젠데 아직도 국방부 망령에 시달리시나요?");
+    if(code[3]==='B') adviceList.push("총은 죄가 없습니다. 죄가 있다면 당신의 무거운 엉덩이와 뱃살이 죄입니다.");
+    if(code[8]==='S') adviceList.push("기스 무서우면 아예 뽁뽁이로 싸세요. 그게 총입니까, 상전입니까?");
+    if(code[3]==='B' && code[7]==='L') adviceList.push("침대 위 방구석에서 무슨 사이트를 보신다고요?");
+    if(code[2] === 'S' && code[3] === 'G') adviceList.push("필드에서 탄피 배출식을 쓰다니... 게임은 안 하고 탄피 줍느라 엉덩이만 보여주실 타입이네요.");
+    if(code[4] === 'O' && code[6] === 'I') adviceList.push("집은 월세여도 광학은 오리(Original)인 당신, 진정한 솦푸어입니다.");
+    if(code[2] === 'M') adviceList.push("에어코킹만 고집하는 당신, 환경보호가인가요? 가스건 한 번 맛보면 못 돌아옵니다.");
+    if(code[9] === 'H' && code[2] === 'G') adviceList.push("가스 중독자시군요. 겨울철엔 라이터로 탄창 데우다가 손 데지 않게 조심하세요.");
+    if(code[5] === 'M' && code[1] === 'G') adviceList.push("기관총에 미니멀리즘이라니...");
+    if(code[4] === 'N' && code[7] === 'N') adviceList.push("광학도 없고 아이언 사이트만 고집하는 당신, 혹시 시력이 6.0인가요?");
+    if(code[6] === 'R' && code[8] === 'D') adviceList.push("더치트 상주하며 중고장터만 매복하는 하이에나님, 그러다 사기꾼한테 '전술적 긴빠이' 당하니 조심하세요.");
+
+    let finalAdvice = adviceList.length > 0 
+        ? adviceList[Math.floor(Math.random() * adviceList.length)] 
+        : "장비 탓하기 전에 사격장 가서 연습이나 더 하세요.";
+        
+    document.getElementById('final-advice').innerText = "💡 조언: " + finalAdvice;
 }
 
 async function addComment() {
