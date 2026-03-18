@@ -1,129 +1,206 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A-ASTI 4.0</title>
-<style>
-:root { --main:#fff; --bg:#121212; --card:#1e1e1e; --accent:#ff3300; }
-body { background:var(--bg); color:var(--main); font-family:sans-serif; margin:0; padding:20px; }
-.container { max-width:480px; margin:auto; background:var(--card); padding:30px; border-radius:16px; }
-.q-text { font-size:1.2rem; margin-bottom:20px; }
-button { width:100%; margin:6px 0; padding:16px; border:none; border-radius:10px; background:#2a2a2a; color:#fff; cursor:pointer; }
-button:hover { background:#3a3a3a; }
-.progress { text-align:center; margin-bottom:10px; color:#777; }
-.result { display:none; }
-.bar { height:6px; background:#333; border-radius:10px; overflow:hidden; margin-bottom:15px; }
-.bar-inner { height:100%; background:var(--accent); width:0%; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-ASTI 3.5 판독 시스템</title>
+    <style>
+        :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #0f0f0f; --card-bg: #1a1a1a; --btn-bg: #2a2a2a; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; }
+        
+        .container { width: 100%; max-width: 500px; margin: 20px auto; background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; }
+        
+        /* 진행률 바 개선 */
+        .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease; }
+        
+        h1 { font-size: 0.9rem; text-align: center; color: #666; letter-spacing: 2px; margin-bottom: 10px; }
+        .q-text { font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; text-align: center; word-break: keep-all; min-height: 3.5em; display: flex; align-items: center; justify-content: center; }
+        
+        .btn-grid { display: flex; flex-direction: column; gap: 12px; }
+        button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; }
+        button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
+        button:active { transform: scale(0.98); }
+
+        /* 결과 화면 */
+        .final-area { display: none; }
+        .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
+        .user-title { font-size: 2.2rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; word-break: keep-all; }
+        
+        .analysis-box { background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
+        .analysis-item { font-size: 0.95rem; color: #ccc; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
+        .analysis-item b { color: var(--accent-color); white-space: nowrap; }
+
+        .advice-card { padding: 20px; background: #251010; border-radius: 15px; color: #ff8888; font-size: 1rem; border-left: 5px solid var(--accent-color); position: relative; overflow: hidden; }
+        .advice-card::before { content: "ADVICE"; position: absolute; top: -5px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.05; }
+        
+        .share-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px; }
+        .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; opacity: 1; animation: none; }
+        .primary { background: var(--accent-color); color: white; }
+        .secondary { background: #444; color: white; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
 <body>
+
 <div class="container">
-<div class="progress" id="progress">START</div>
-<div class="bar"><div class="bar-inner" id="bar"></div></div>
-<div id="test"></div>
-<div id="result" class="result">
-<h2 id="title"></h2>
-<p id="type"></p>
-<p id="desc"></p>
-<p id="advice"></p>
-<button onclick="shareResult()">공유하기</button>
-<button onclick="location.reload()">다시하기</button>
-</div>
+    <h1>A-ASTI PSYCHOLOGICAL SCANNER</h1>
+    <div class="progress-container"><div id="progress-fill"></div></div>
+    
+    <div id="test-area">
+        <p id="question" class="q-text">데이터 동기화 완료. 스캔을 시작하시겠습니까?</p>
+        <div id="options" class="btn-grid">
+            <button onclick="startTest()" style="text-align: center;">[ 시스템 가동 ]</button>
+        </div>
+    </div>
+
+    <div id="result-area" class="final-area">
+        <div id="type-code" class="type-badge">TYPE: UNKNOWN</div>
+        <h2 class="user-title" id="final-title">분석 중...</h2>
+        
+        <div class="analysis-box" id="final-desc"></div>
+        <div class="advice-card" id="final-advice"></div>
+        
+        <div class="share-group">
+            <button onclick="shareResult()" class="share-btn primary">결과 공유하기</button>
+            <button onclick="location.href=location.pathname" class="share-btn secondary">다시 테스트</button>
+        </div>
+    </div>
 </div>
 
 <script>
-let step=0, code=[];
-
-const questions=[
-{q:"총기 출신 취향은?",o:{U:"미제",R:"러시아",K:"국산",O:"기타"}},
-{q:"선호 체급은?",o:{A:"AR",S:"SMG",B:"저격",G:"샷건"}},
-{q:"작동 방식은?",o:{G:"가스",E:"전동",S:"탄피",M:"수동"}},
-{q:"플레이 스타일은?",o:{G:"필드",S:"사격",B:"집",C:"수집"}},
-{q:"옵션 스타일은?",o:{O:"실물",R:"레플",H:"혼합",N:"순정"}},
-{q:"취향은?",o:{T:"택티컬",O:"올드",M:"미니멀",S:"괴상"}},
-{q:"소비 성향은?",o:{I:"충동",P:"계획",S:"수집",R:"중고"}},
-{q:"조준 방식은?",o:{V:"도트",L:"간지",N:"기본",M:"고배율"}},
-{q:"관리 스타일은?",o:{S:"신품",W:"웨더링",O:"빈티지",D:"막씀"}},
-{q:"최종 목표는?",o:{R:"리얼",P:"성능",E:"컬렉션",H:"행복"}}
+/* ---------------------------------------------------------
+   1. 데이터 정의 (질문, 타이틀, 독설)
+--------------------------------------------------------- */
+const questions = [
+    { id: "origin", q: "당신을 전율케 하는 총기의 혈통은?", o: {U:"천조국 미제 감성", R:"불곰국 빨갱이 감성", K:"웅장한 국산 K-감성", O:"기타/독고다이"} },
+    { id: "class", q: "단 한 정의 장비만 챙겨야 한다면?", o: {A:"돌격소총(AR/AK)", S:"기관단총(SMG)", B:"저격소총(Sniper)", G:"샷건/기관총"} },
+    { id: "power", q: "절대 타협할 수 없는 구동 방식은?", o: {G:"가스/HPA (반동파)", E:"전동건 (성능 효율파)", S:"탄피배출 (리얼리티파)", M:"에어코킹 (근육파)"} },
+    { id: "place", q: "당신의 주된 서식지는 어디인가?", o: {G:"필드 게이머", S:"슈팅 매치 파", B:"방구석 슈터", C:"콜렉터"} },
+    { id: "optic", q: "현재 장착된 옵션의 실체는?", o: {O:"오리지널 실물", R:"가성비 레플리카", H:"혼종 하이브리드", N:"순정 지상주의"} },
+    { id: "style", q: "추구하는 장비의 외형적 미학은?", o: {T:"풀세팅 택티컬", O:"우드/스틸 올드스쿨", M:"미니멀리즘", S:"기괴한 유니크"} },
+    { id: "money", q: "월급날 당신의 통장 상태는?", o: {I:"지름신 강림 충동구매", P:"리뷰 100개 보는 계획소비", S:"단종될까 무서운 수집광", R:"중고장터 매복 기변증"} },
+    { id: "aim", q: "조준경에 대한 당신의 철학은?", o: {V:"성능의 레드도트", L:"간지의 대구경", N:"날것의 가늠자", M:"변태적 고배율"} },
+    { id: "care", q: "장비 관리 상태를 한마디로?", o: {S:"기스 하나 없는 신품급", W:"거친 웨더링 성애자", O:"세월의 흔적 빈티지", D:"작동만 되면 장땡"} },
+    { id: "end", q: "에어소프트 취미의 끝은 무엇인가?", o: {R:"지독한 리얼리즘", P:"극한의 퍼포먼스", E:"끝판왕 컬렉션", H:"나만의 행복한 덕질"} }
 ];
 
-const pre={I:"통장파괴",P:"계획형",S:"수집광",R:"장터러"};
-const mid={G:"반동중독",E:"효율충",S:"탄피변태",M:"근육파"};
-const suf={G:"야수",S:"사격러",B:"방구석",C:"콜렉터"};
-
-const specialTitles=[
-{cond:(c)=>c[4]==='O'&&c[6]==='I',title:"실물충동 파산러"},
-{cond:(c)=>c[2]==='S'&&c[8]==='S',title:"탄피 집착 장인"},
-{cond:(c)=>c[3]==='B'&&c[6]==='P',title:"고독한 분석가"}
+// 특수 조건 기반 타이틀 (우선순위 순서대로)
+const specialTitles = [
+    { condition: (c) => c[0]==='U' && c[4]==='O', title: "천조국 오리지널 맹신도" },
+    { condition: (c) => c[2]==='S' && c[6]==='R', title: "탄피 줍다 장터로 런하는 낭만파" },
+    { condition: (c) => c[3]==='B' && c[7]==='M', title: "방구석 고배율 관음 슈터" },
+    { condition: (c) => c[6]==='I' && c[4]==='O', title: "통장이 파산한 실물 수집가" },
+    { condition: (c) => c[0]==='R' && c[5]==='O', title: "시베리아 불곰의 후예" },
+    { condition: (c) => c[2]==='M' && c[3]==='G', title: "근육으로 필드 씹어먹는 괴수" }
 ];
 
-function render(){
-let q=questions[step];
-document.getElementById('progress').innerText=`${step+1}/${questions.length}`;
-document.getElementById('bar').style.width=((step/questions.length)*100)+"%";
-let html=`<div class='q-text'>${q.q}</div>`;
-for(let k in q.o){
-html+=`<button onclick="select('${k}')">${q.o[k]}</button>`;
-}
-document.getElementById('test').innerHTML=html;
-}
+// 조합용 파편
+const fragments = {
+    money: { I:"파산 직전의", P:"치밀한", S:"집착적인", R:"장터 죽돌이" },
+    power: { G:"가스 중독", E:"효율 중시", S:"탄피 성애", M:"근력 장전" },
+    place: { G:"야생마", S:"스나이퍼", B:"방구석 요원", C:"먼지떨이" }
+};
 
-function select(k){
-code.push(k);
-step++;
-if(step<questions.length) render(); else result();
-}
+/* ---------------------------------------------------------
+   2. 핵심 로직
+--------------------------------------------------------- */
+let responses = [];
 
-function result(){
-document.getElementById('test').style.display='none';
-document.getElementById('result').style.display='block';
+// 시작 시 URL 파라미터 체크 (공유 기능)
+window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resultData = urlParams.get('r');
+    if (resultData && resultData.length === 10) {
+        responses = resultData.split('');
+        showResult();
+    }
+};
 
-let typeCode=code.join('');
-let title=`${pre[code[6]]} ${mid[code[2]]} ${suf[code[3]]}`;
-
-for(let s of specialTitles){ if(s.cond(code)) title=s.title; }
-
-let desc="";
-if(code[3]==='G') desc+="필드 중심 플레이어. ";
-if(code[3]==='C') desc+="수집형 성향 강함. ";
-if(code[6]==='I') desc+="충동구매 성향. ";
-if(code[6]==='P') desc+="계획형 소비자. ";
-
-let advice="";
-if(code[6]==='I') advice="지출 관리 필요";
-else if(code[2]==='S') advice="탄피 집착 줄이기";
-else advice="장비보다 실력";
-
-// URL 공유용
-let url=location.origin+location.pathname+"?r="+typeCode;
-
-// 출력
-
-document.getElementById('title').innerText=title;
-document.getElementById('type').innerText="유형 코드: "+typeCode;
-document.getElementById('desc').innerText=desc;
-document.getElementById('advice').innerText=advice;
-
-history.replaceState(null,null,"?r="+typeCode);
+function startTest() {
+    responses = [];
+    renderQuestion(0);
 }
 
-function shareResult(){
-if(navigator.share){
-navigator.share({title:"A-ASTI 결과",text:"내 유형 확인",url:location.href});
-}else{
-prompt("링크 복사",location.href);
-}
+function renderQuestion(step) {
+    const progress = ((step) / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = `${progress}%`;
+
+    const q = questions[step];
+    document.getElementById('question').innerText = q.q;
+    
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    
+    Object.entries(q.o).forEach(([key, value], index) => {
+        const btn = document.createElement('button');
+        btn.innerText = value;
+        btn.style.animationDelay = `${index * 0.1}s`;
+        btn.onclick = () => {
+            responses.push(key);
+            if (step + 1 < questions.length) renderQuestion(step + 1);
+            else showResult();
+        };
+        optionsDiv.appendChild(btn);
+    });
 }
 
-// 결과 바로 보기
-const params=new URLSearchParams(location.search);
-if(params.get('r')){
-code=params.get('r').split('');
-result();
-}else{
-render();
+function showResult() {
+    document.getElementById('test-area').style.display = 'none';
+    document.getElementById('result-area').style.display = 'block';
+    document.getElementById('progress-fill').style.width = `100%`;
+
+    const typeCode = responses.join('');
+    document.getElementById('type-code').innerText = `TYPE: ${typeCode}`;
+
+    // 1. 타이틀 결정
+    let finalTitle = `${fragments.money[responses[6]]} ${fragments.power[responses[2]]} ${fragments.place[responses[3]]}`;
+    for (const sp of specialTitles) {
+        if (sp.condition(responses)) {
+            finalTitle = sp.title;
+            break;
+        }
+    }
+    document.getElementById('final-title').innerText = finalTitle;
+
+    // 2. 분석 내용 동적 생성
+    const descDiv = document.getElementById('final-desc');
+    descDiv.innerHTML = `
+        <div class="analysis-item"><b>성향:</b> ${questions[0].o[responses[0]]} 베이스의 ${questions[5].o[responses[5]]} 스타일</div>
+        <div class="analysis-item"><b>전술:</b> ${questions[3].o[responses[3]]} 활동을 즐기며 ${questions[7].o[responses[7]]}을 선호함</div>
+        <div class="analysis-item"><b>경제:</b> ${questions[6].o[responses[6]]} 패턴을 보이며 ${questions[4].o[responses[4]]} 위주의 장비 구성</div>
+    `;
+
+    // 3. 독설 로직 강화
+    let advice = "";
+    if (responses[6] === 'I' && responses[4] === 'O') advice = "취미에 쏟는 열정의 반만이라도 적금에 쏟으세요. 광학 장비가 밥 먹여주지 않습니다.";
+    else if (responses[2] === 'S') advice = "탄피 줍는 모습이 꼭 이삭 줍는 여인 같네요. 그 낭만, 필드 나가면 5분 만에 후회로 바뀝니다.";
+    else if (responses[3] === 'B') advice = "총은 죄가 없습니다. 죄가 있다면 당신을 방구석에 가둔 당신의 귀찮음이겠죠.";
+    else if (responses[8] === 'S') advice = "기스 날까 봐 무서우면 에어캡에 싸서 보관만 하세요. 그게 총입니까, 상전입니까?";
+    else advice = "장비 탓하기 전에 사격장 가서 영점부터 다시 잡으세요. 문제는 언제나 총구 뒤에 있는 법입니다.";
+
+    document.getElementById('final-advice').innerText = advice;
+}
+
+function shareResult() {
+    const code = responses.join('');
+    const shareUrl = `${window.location.origin}${window.location.pathname}?r=${code}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'A-ASTI 자아 판독 결과',
+            text: `나의 에어소프트 성향은 [${document.getElementById('final-title').innerText}]! 결과 확인해보세요.`,
+            url: shareUrl,
+        });
+    } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('공유 링크가 클립보드에 복사되었습니다!');
+        });
+    }
 }
 </script>
+
 </body>
 </html>
