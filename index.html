@@ -8,37 +8,28 @@
     <style>
         :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #0f0f0f; --card-bg: #1a1a1a; --btn-bg: #2a2a2a; }
         body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; }
-        
         .container { width: 100%; max-width: 500px; margin: 20px auto; background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; }
-        
         .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease; }
-        
         h1 { font-size: 0.9rem; text-align: center; color: #666; letter-spacing: 2px; margin-bottom: 10px; }
         .q-text { font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; text-align: center; word-break: keep-all; min-height: 3.5em; display: flex; align-items: center; justify-content: center; }
-        
         .btn-grid { display: flex; flex-direction: column; gap: 12px; }
         button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; }
         button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
         button:active { transform: scale(0.98); }
-
         .final-area { display: none; }
-        #capture-area { padding: 10px; background: var(--card-bg); border-radius: 15px; }
+        #capture-area { padding: 15px; background: var(--card-bg); border-radius: 15px; }
         .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
-        .user-title { font-size: 2.2rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; word-break: keep-all; }
-        
+        .user-title { font-size: 2.2rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; word-break: keep-all; color: #fff; }
         .analysis-box { background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
         .analysis-item { font-size: 0.95rem; color: #ccc; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
         .analysis-item b { color: var(--accent-color); white-space: nowrap; }
-
         .advice-card { padding: 20px; background: #251010; border-radius: 15px; color: #ff8888; font-size: 1rem; border-left: 5px solid var(--accent-color); position: relative; overflow: hidden; }
         .advice-card::before { content: "ADVICE"; position: absolute; top: -5px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.05; }
-        
         .share-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px; }
         .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; }
         .primary { background: var(--accent-color); color: white; }
         .secondary { background: #444; color: white; }
-
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -59,11 +50,9 @@
         <div id="capture-area">
             <div id="type-code" class="type-badge">TYPE: UNKNOWN</div>
             <h2 class="user-title" id="final-title">분석 중...</h2>
-            
             <div class="analysis-box" id="final-desc"></div>
             <div class="advice-card" id="final-advice"></div>
         </div>
-        
         <div class="share-group">
             <button onclick="saveResultImage()" class="share-btn primary">결과 이미지 저장</button>
             <button onclick="location.href=location.pathname" class="share-btn secondary">다시 테스트</button>
@@ -85,52 +74,22 @@ const questions = [
     { id: "end", q: "에어소프트 취미의 끝은 무엇인가?", o: {R:"외형/성능 리얼리즘", P:"집탄", E:"내구", H:"반동"} }
 ];
 
-// 특수 호칭 대폭 증설
 const specialTitles = [
-    // [국가/고증 관련]
+    { condition: (c) => c[6]==='S' && c[7]==='L', title: "총 훔쳐서 야동 보는 사회부적응자" },
+    { condition: (c) => c[6]==='S', title: "필드의 대도(大盜)" },
+    { condition: (c) => c[7]==='L', title: "조준경으로 야동 보는 변태" },
     { condition: (c) => c[0]==='K' && c[5]==='O', title: "국방부 고증에 미친 5분 대기조" },
     { condition: (c) => c[0]==='U' && c[4]==='O', title: "트럼프 똥꼬 닦개 (오리 광학 맹신도)" },
-    { condition: (c) => c[0]==='R' && (c[2]==='G' || c[5]==='O'), title: "시베리아 불곰의 투박한 후예" },
-    { condition: (c) => c[0]==='E' && c[5]==='T', title: "유럽산 택티컬 허세가 가득한 귀족" },
-    
-    // [장비/집착 관련]
     { condition: (c) => c[2]==='S' && c[3]==='G', title: "필드에서 탄피 줍는 이삭 줍는 여인" },
-    { condition: (c) => c[4]==='O' && c[6]==='I', title: "카드값보다 렌즈 투과율이 소중한 파산자" },
+    { condition: (c) => c[3]==='B' && c[7]==='M', title: "유튜브로 사격 배운 방구석 데브그루" },
     { condition: (c) => c[9]==='P' && c[7]==='M', title: "타겟지에 구멍 하나만 뚫으려는 결벽증 요원" },
     { condition: (c) => c[8]==='S' && c[3]==='C', title: "기스 날까 봐 박스에만 모시는 상전님" },
     { condition: (c) => c[4]==='N' && c[7]==='N', title: "순정에 미친 광기의 미니멀리스트" },
-    
-    // [플레이 스타일 관련]
-    { condition: (c) => c[3]==='B' && c[7]==='M', title: "유튜브로 사격 배운 방구석 데브그루" },
-    { condition: (c) => c[1]==='G' && c[2]==='M', title: "펌프액션으로 어깨 조지는 헬창 슈터" },
-    { condition: (c) => c[6]==='R' && c[8]==='D', title: "남이 쓰다 버린 장비 찾는 하이에나" },
-    { condition: (c) => c[7]==='L' && c[5]==='T', title: "레이저 포인터로 고양이랑 노는 택티컬남" },
-    { condition: (c) => c[2]==='G' && c[9]==='H', title: "뇌 흔들리는 반동에 중독된 가스 중독자" },
-    { condition: (c) => c[1]==='S' && c[3]==='S', title: "좁은 데만 찾아다니는 CQB 중독 빌런" },
-    { condition: (c) => c[6]==='S' && c[8]==='W', title: "일단 사고 장터로 보내는 '중고장터 퀵서비스'" }  
-    
-    // [신규: 트롤링/변태 섹션]
-    { condition: (c) => c[6]==='S', title: "필드의 대도(大盜)" }, // 일단 훔치기
-    { condition: (c) => c[7]==='L', title: "조준경으로 야동 보는 변태" }, // 야동 사이트
-    { condition: (c) => c[6]==='S' && c[7]==='L', title: "정말 총을 훔친 다음 지하철에서 야동 사이트에 접속했습니까?" }, 
-    { condition: (c) => c[1]==='G' && c[7]==='L', title: "샷건 들고 야동 사이트 접속한 괴인" },
-
-    // [기존 및 확장: 국가/고증/장비]
-    { condition: (c) => c[0]==='K' && c[5]==='O', title: "국방부 고증에 미친 5분 대기조" },
-    { condition: (c) => c[0]==='U' && c[4]==='O', title: "트럼프 똥꼬 닦개 (오리 광학 맹신도)" },
-    { condition: (c) => c[2]==='S' && c[3]==='G', title: "필드에서 탄피 줍는 이삭 줍는 여인" },
-    { condition: (c) => c[3]==='B' && c[7]==='M', title: "유튜브로 사격 배운 방구석 데브그루" },
-    { condition: (c) => c[9]==='P' && c[7]==='M', title: "타겟지에 구멍 하나만 뚫으려는 결벽증 요원" },
-    { condition: (c) => c[8]==='S' && c[3]==='C', title: "기스 날까 봐 박스에만 모시는 상전님" },
     { condition: (c) => c[6]==='I' && c[4]==='O', title: "카드값보다 렌즈 투과율이 소중한 파산자" },
     { condition: (c) => c[2]==='G' && c[9]==='H', title: "뇌 흔들리는 반동에 중독된 가스 중독자" },
-    { condition: (c) => c[6]==='R' && c[8]==='D', title: "남이 쓰다 버린 장비 찾는 하이에나" },
-    { condition: (c) => c[0]==='R' && c[5]==='O', title: "시베리아 불곰의 투박한 후예" },
-    { condition: (c) => c[4]==='N' && c[7]==='N', title: "순정에 미친 광기의 미니멀리스트" },
-    { condition: (c) => c[5]==='T' && c[4]==='R', title: "가품으로 풀세팅한 백화점 마네킹" }
+    { condition: (c) => c[6]==='R' && c[8]==='D', title: "중고장터의 하이에나" }
 ];
 
-// 일반 호칭 수식어 증설
 const fragments = {
     money: { I:"파산 직전의", P:"치밀하고 깐깐한", S:"물욕에 눈 먼", R:"장터 죽돌이" },
     power: { G:"가스 중독", E:"효율 중시형", S:"탄피 성애", M:"근력 장전" },
@@ -173,13 +132,9 @@ function showResult() {
     const code = responses;
     document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
 
-    // 호칭 결정 로직
     let fTitle = `${fragments.money[code[6]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
     for (const sp of specialTitles) {
-        if (sp.condition(code)) {
-            fTitle = sp.title;
-            break;
-        }
+        if (sp.condition(code)) { fTitle = sp.title; break; }
     }
     document.getElementById('final-title').innerText = fTitle;
 
@@ -189,29 +144,31 @@ function showResult() {
         <div class="analysis-item"><b>경제:</b> ${questions[6].o[code[6]]} 패턴을 보이는 ${questions[4].o[code[4]]} 유저</div>
     `;
 
-    // 조언 로직 확장
     let advice = "💡 조언: ";
-    if(code[0]==='K') advice += "K-시리즈는 고증이 아니라 PTSD입니다. 군대 다시 가는 꿈 꾸기 싫으면 적당히 하세요.";
+    // 트롤링 선택지 우선 조언
+    if(code[6]==='S') advice += "남의 장비 훔칠 생각 하지 말고 성실하게 돈 벌어서 사세요. 필드에서 은팔찌 차고 싶습니까?";
+    else if(code[7]==='L') advice += "조준경은 표적을 보라고 있는 거지, 그런 거 보라고 있는 게 아닙니다. 모니터랑 총이랑 구분 좀 하세요.";
+    // 일반 조언
+    else if(code[0]==='K') advice += "K-시리즈는 고증이 아니라 PTSD입니다. 군대 다시 가는 꿈 꾸기 싫으면 적당히 하세요.";
     else if(code[9]==='P') advice += "탄착군 안 나오면 총 탓하기 전에 영점부터 잡으세요. 문제는 언제나 총구 뒤에 있습니다.";
-    else if(code[6]==='I' && code[4]==='O') advice += "오리 광학 살 돈으로 부모님 내복이나 사드리세요.";
-    else if(code[2]==='S') advice += "탄피 줍는 모습이 꼭 이삭 줍는 여인 같네요.";
-    else if(code[3]==='B') advice += "총은 죄가 없습니다. 당신을 방구석에 가둔 귀찮음이 죄일 뿐.";
-    else if(code[8]==='S') advice += "기스 날까 봐 무서우면 아예 에어캡에 싸서 보관만 하세요.";
+    else if(code[6]==='I' && code[4]==='O') advice += "오리 광학 살 돈으로 부모님 내복이나 사드리세요. 통장이 울고 있습니다.";
+    else if(code[2]==='S') advice += "필드에서 탄피 줍는 모습이 꼭 이삭 줍는 여인 같네요. 낭만 찾다 허리 나갑니다.";
+    else if(code[3]==='B') advice += "총은 죄가 없습니다. 당신을 방구석에 가둔 귀찮음과 뱃살이 죄일 뿐.";
+    else if(code[8]==='S') advice += "기스 날까 봐 무서우면 아예 에어캡에 싸서 보관만 하세요. 그게 총입니까, 상전입니까?";
     else advice += "장비 탓하기 전에 사격장 가서 연습이나 더 하세요. 실력이 장비를 못 따라가고 있습니다.";
+    
     document.getElementById('final-advice').innerText = advice;
 }
 
-// 이미지 저장 기능
 function saveResultImage() {
     const area = document.getElementById('capture-area');
-    html2canvas(area, {
-        backgroundColor: '#1a1a1a',
-        scale: 2
-    }).then(canvas => {
+    html2canvas(area, { backgroundColor: '#1a1a1a', scale: 2 }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `airsoft-mbti-${Date.now()}.png`;
-        link.href = canvas.toDataURL();
+        link.download = `airsoft-result-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
         link.click();
+    }).catch(err => {
+        alert("이미지 저장 중 오류가 발생했습니다. 브라우저 설정을 확인해주세요.");
     });
 }
 </script>
