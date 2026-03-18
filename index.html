@@ -104,7 +104,7 @@ const specialTitles = [
 const fragments = {
     origin: { 
         U: "미제 앞잡이고", 
-        R: "보드카 냄새 풍기는 강철 막대기 줍고", 
+        R: "빨갱이고", 
         K: "K-짬내 진동하는 총을 굳이 사고", 
         E: "콧대 높은 유럽산을 애용하고" 
     },
@@ -164,8 +164,8 @@ function showResult() {
 
     document.getElementById('final-desc').innerHTML = `
         <div class="analysis-item"><b>취향:</b> ${questions[0].o[code[0]]} / ${questions[5].o[code[5]]}</div>
-        <div class="analysis-item"><b>전술:</b> ${questions[3].o[code[3]]} 내 ${questions[7].o[code[7]]} 활용</div>
-        <div class="analysis-item"><b>경제:</b> ${questions[6].o[code[6]]} 패턴의 ${questions[4].o[code[4]]}</div>
+        <div class="analysis-item"><b>성향:</b> ${questions[3].o[code[3]]} 에서 ${questions[7].o[code[7]]} 애용</div>
+        <div class="analysis-item"><b>경제:</b> ${questions[6].o[code[6]]} (으)로 ${questions[4].o[code[4]]} 구해</div>
     `;
 
     let advice = "💡 조언: ";
