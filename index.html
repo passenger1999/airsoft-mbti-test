@@ -3,39 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-ASTI 2.0 판독기</title>
+    <title>A-ASTI 2.0 정밀 판독 시스템</title>
     <style>
-        :root { --main-color: #00ff41; --bg-color: #0d0208; }
-        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { width: 90%; max-width: 500px; border: 2px solid var(--main-color); padding: 25px; background: rgba(0, 0, 0, 0.9); border-radius: 10px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); }
-        h1 { font-size: 1.4rem; text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--main-color); padding-bottom: 10px; }
-        .result-view { font-size: 1.8rem; font-weight: bold; text-align: center; margin-bottom: 30px; color: #fff; text-shadow: 0 0 8px var(--main-color); height: 40px; }
-        .q-text { font-size: 1.1rem; margin-bottom: 25px; color: #ddd; text-align: center; line-height: 1.4; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button { background: transparent; border: 1px solid var(--main-color); color: var(--main-color); padding: 14px; cursor: pointer; font-family: inherit; transition: 0.2s; border-radius: 4px; }
+        :root { --main-color: #00ff41; --bg-color: #0d0208; --border-color: #008f11; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; box-sizing: border-box; }
+        .card { width: 100%; max-width: 600px; border: 1px solid var(--border-color); padding: 20px; background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 30px rgba(0, 255, 65, 0.1); position: relative; }
+        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 4px; }
+        .result-view { font-size: 1.3rem; text-align: center; margin-bottom: 25px; color: #fff; text-shadow: 0 0 5px var(--main-color); min-height: 35px; border: 1px dashed #333; padding: 10px; }
+        .q-text { font-size: 1rem; margin-bottom: 20px; color: #00ff41; text-align: left; line-height: 1.4; border-left: 3px solid var(--main-color); padding-left: 10px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { background: #001100; border: 1px solid var(--border-color); color: var(--main-color); padding: 12px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
         button:hover { background: var(--main-color); color: #000; font-weight: bold; }
-        .final-area { text-align: center; display: none; }
-        .desc { color: #aaa; font-size: 0.95rem; line-height: 1.7; margin: 20px 0; border: 1px dashed #444; padding: 15px; text-align: left; }
-        .restart-btn { margin-top: 20px; width: 100%; background: var(--main-color); color: #000; font-weight: bold; border: none; padding: 15px; cursor: pointer; }
+        .final-area { display: none; text-align: left; border-top: 1px solid var(--border-color); padding-top: 20px; }
+        .desc-box { background: #050505; border: 1px solid #222; padding: 15px; font-size: 0.85rem; line-height: 1.8; color: #ccc; }
+        .highlight { color: #fff; font-weight: bold; background: #004400; padding: 0 4px; }
+        .restart-btn { margin-top: 20px; width: 100%; background: #00ff41; color: #000; font-weight: bold; border: none; padding: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>[ A-ASTI 2.0 SCANNER ]</h1>
-    <div id="display" class="result-view">READY_</div>
+    <h1>[ A-ASTI 2.0 NEURAL SCAN ]</h1>
+    <div id="display" class="result-view">AWAITING_INPUT...</div>
     
     <div id="test-area">
-        <p id="question" class="q-text">에어소프트 자아 분석 스캔을 시작하시겠습니까?</p>
+        <p id="question" class="q-text">에어소프트 유저 성향 정밀 스캔을 시작하시겠습니까?</p>
         <div id="options" class="btn-grid">
-            <button onclick="startTest()" style="grid-column: span 2;">[ SCAN START ]</button>
+            <button onclick="startTest()" style="grid-column: span 2;">[ START SYSTEM SCAN ]</button>
         </div>
     </div>
 
     <div id="result-area" class="final-area">
-        <h2 style="color:#fff;">SCAN COMPLETE</h2>
-        <div class="desc" id="final-desc"></div>
-        <button onclick="location.reload()" class="restart-btn">RE-SCAN</button>
+        <h2 style="color:#fff; font-size: 1rem; text-align: center;">- ANALYSIS REPORT -</h2>
+        <div class="desc-box" id="final-desc"></div>
+        <button onclick="location.reload()" class="restart-btn">RE-SCAN SYSTEM</button>
     </div>
 </div>
 
@@ -44,25 +45,41 @@
     let step = 0;
 
     const questions = [
-        { q: "1. 어느 나라의 '철학'을 따릅니까?", o: {U:"미제(USA)", R:"러시아(RUS)", E:"유럽(EUR)", K:"국산(KOR)", J:"일본(JPN)"} },
-        { q: "2. 주력 화기 체급은 무엇입니까?", o: {A:"소총(AR/AK)", S:"SMG", B:"저격총", G:"지원화기", P:"권총", T:"샷건"} },
-        { q: "3. 당신의 심장을 뛰게 하는 동력은?", o: {G:"가스(GBB)", E:"전동(AEG)", H:"HPA", M:"에어코킹"} },
-        { q: "4. 본인은 어떤 유저 유형입니까?", o: {G:"게이머", S:"스틸챌린지", B:"방구석슈터", C:"콜렉터", H:"고증파"} },
-        { q: "5. 장비 옵션의 순수성은?", o: {O:"오리지널(RS)", R:"레플리카", H:"하이브리드"} },
-        { q: "6. 총을 대하는 근본적인 태도는?", o: {M:"기계변태", P:"찍사", U:"실사용파", A:"아티스트"} },
-        { q: "7. 주변에 알려진 지출액은?", o: {L:"구라쟁이", W:"지갑전사", S:"자유영혼"} }
+        { q: "1. Soul (국가/감성)", o: {U:"미제/서방", R:"러시아/동구", E:"유럽제(HK/SIG)", K:"국산(K-시리즈)", O:"그외/독자노선"} },
+        { q: "2. Class (주력체급)", o: {A:"소총(AR/AK)", S:"SMG/컴팩트", B:"저격총(Bolt)", G:"지원화기(LMG)", P:"권총(Pistol)", T:"샷건(Shotgun)"} },
+        { q: "3. Mechanism (동력원)", o: {G:"가스(GBB)", E:"전동(AEG)", H:"HPA(고압)", S:"탄피배출", M:"에어코킹"} },
+        { q: "4. Identity (활동성향)", o: {G:"게이머", S:"스틸챌린지", B:"방구석슈터", C:"콜렉터"} },
+        { q: "5. Parts (장비순수성)", o: {O:"오리지널(RS)", R:"레플리카", H:"하이브리드", N:"순정/무옵션"} },
+        { q: "6. Vibe (외형스타일)", o: {T:"택티컬/최신", O:"올드스쿨", M:"미니멀", S:"유니크/SF"} },
+        { q: "7. Spending (소비패턴)", o: {I:"충동구매", P:"계획소비", S:"쟁여두기", R:"중고기변"} },
+        { q: "8. Attachment (광학철학)", o: {V:"성능/선명도", L:"룩/디자인", N:"무광학", M:"고배율/망원"} },
+        { q: "9. Condition (관리상태)", o: {S:"신품급/박스풀", W:"전투흔적/웨더링", O:"빈티지/헤리티지", D:"작동만되면장땡"} },
+        { q: "10. Final Goal (최종목표)", o: {R:"리얼리즘", P:"퍼포먼스", E:"끝판왕장비", H:"즐거운취미"} }
     ];
+
+    const dataDB = {
+        S1: { U:"미제 장비의 실전성을 맹신하며,", R:"불곰국의 투박한 쇠 냄새에 취해 있으며,", E:"유럽제의 세련된 성능을 추구하며,", K:"K-시리즈에 애국심을 불태우며,", O:"남들과는 다른 독자적인 노선을 걷는" },
+        S2: { A:"AR/AK류 돌격소총을 주력으로 다루는", S:"빠른 기동성의 SMG를 선호하는", B:"한 발의 정밀함에 목숨 거는 스나이퍼형", G:"압도적인 화력으로 밀어붙이는 건너형", P:"권총 한 자루면 충분한 미니멀리스트", T:"샷건의 작동 손맛에 중독된" },
+        S3: { G:"반동에 영혼을 판 GBB 애호가.", E:"신뢰성을 중시하는 실용적인 전동건 유저.", H:"반응 속도의 끝을 보는 HPA 외계인.", S:"탄피 줍는 수고를 감수하는 낭만파.", M:"팔 근육과 스프링만 믿는 고독한 사수." },
+        S4: { G:"필드의 최전선에서 구르는 게 낙인 야생형 유저입니다.", S:"0.01초를 다투는 정밀 사격의 달인이군요.", B:"방구석 사격장의 지배자이자 타겟지의 저승사자입니다.", C:"장식장의 조명을 받으며 빛나는 총기를 감상하는 박물관장님입니다." },
+        S5: { O:"모든 옵션은 '오리지널'이어야만 만족하는 파산 직전의 완벽주의자군요.", R:"가성비 레플리카로 스마트하게 장비를 꾸리는 실속파입니다.", H:"보여지는 건 실물로, 소모품은 레플로 타협하는 하이 리스크-로우 리턴형 유저입니다.", N:"'순정이 곧 튜닝의 끝'이라 믿는 순수주의자입니다." },
+        S6: { T:"최신 전술 장비로 풀세팅된 택티컬의 정점!", O:"나무와 가죽, 철제의 조화를 즐기는 올드스쿨의 후예!", M:"거추장스러운 건 다 떼버리는 미니멀리즘 전사!", S:"남들은 이해 못 하는 본인만의 독특한 세계관을 구축 중!" },
+        S7: { I:"일단 지르고 카드 고지서를 보며 반성하는 충동구매의 화신.", P:"한 달간 리뷰를 섭렵한 뒤에야 결제하는 치밀한 계획가.", S:"'단종되면 어쩔 건데?'라며 일단 쟁여두는 수집광.", R:"중고장터의 매물을 낚아채며 기변의 즐거움을 누리는 장터 사냥꾼." },
+        S8: { V:"조준점의 선명도가 곧 본인의 인격이라 믿는 광학 지상주의자.", L:"성능보다 실루엣! 총과 어울리지 않는 광학은 참지 못합니다.", N:"배터리 따위는 믿지 않는, 기계식 조준기의 전설.", M:"멀리 있는 걸 당겨 봐야 총 쏘는 맛이 나는 망원경 애호가." },
+        S9: { S:"기스 하나에 영혼까지 깎여나가는, 박스 풀세트급 관리 광인입니다.", W:"직접 도색을 까고 긁으며 전투 흔적을 훈장으로 여기는 웨더링 장인입니다.", O:"녹슬고 낡은 느낌에서 세월의 헤리티지를 느끼는 빈티지 마스터입니다.", D:"작동만 되면 진흙이 묻든 말든 상관하지 않는 야생의 유저입니다." },
+        S10: { R:"실총과의 구분이 무의미한 극강의 리얼리즘을 지향합니다.", P:"0.1J의 오차도 허용하지 않는 최고의 퍼포먼스를 목표로 합니다.", E:"'더 이상 살 게 없는' 끝판왕 세팅을 꿈꾸는 지갑 전사입니다.", H:"남들이 뭐라든 본인이 즐거우면 그만인 진정한 취미 생활자입니다." }
+    };
 
     function startTest() { showQuestion(); }
 
     function showQuestion() {
         const q = questions[step];
-        document.getElementById('question').innerText = q.q;
+        document.getElementById('question').innerText = `[STEP ${step+1}] ${q.q}`;
         const optionsDiv = document.getElementById('options');
         optionsDiv.innerHTML = '';
         for (const [key, value] of Object.entries(q.o)) {
             const btn = document.createElement('button');
-            btn.innerText = `${value} [${key}]`;
+            btn.innerText = value;
             btn.onclick = () => selectOption(key);
             optionsDiv.appendChild(btn);
         }
@@ -78,18 +95,19 @@
     function showResult() {
         document.getElementById('test-area').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
-        const fCode = code.join('-');
-        let comment = `분석된 고유 코드: <b>${fCode}</b><br><br>`;
         
-        // 간단한 조건별 팩폭 로직
-        if(code[2] === 'G' && code[4] === 'O') comment += "📌 반동 없이는 못 사는 오리 광학 성애자군요. 지갑은 가볍지만 어깨는 든든하시겠네요.<br>";
-        if(code[3] === 'B' && code[5] === 'M') comment += "📌 필드보다 책상이 익숙한 기계변태 방구석 슈터입니다. 총구보다 먼지 닦는 시간이 더 많으시죠?<br>";
-        if(code[6] === 'L') comment += "📌 [경고] 허위 보고 감지. 가족/지인에게 공개한 장비 가격이 실제의 20% 미만일 확률이 매우 높습니다.<br>";
-        if(code[0] === 'R') comment += "📌 동무, AK를 들고 고르카를 입으니 가슴이 뜨거워지지 않습니까? 감성 넘치는 불곰국 전사군요.<br>";
-        if(code[3] === 'S') comment += "📌 0.01초의 정밀함에 목숨 거는 타겟 사격 광인입니다. 장비의 성능이 곧 본인의 인격이군요.<br>";
+        let rText = `<span class="highlight"># 성향 분석 리포트 [${code.join('-')}]</span><br><br>`;
+        rText += `당신은 ${dataDB.S1[code[0]]} ${dataDB.S2[code[1]]} ${dataDB.S3[code[2]]}<br><br>`;
+        rText += `분석 결과, ${dataDB.S4[code[3]]}<br><br>`;
+        rText += `장비 성향은 ${dataDB.S5[code[4]]} 외형적으로는 ${dataDB.S6[code[5]]}<br><br>`;
+        rText += `또한 당신은 ${dataDB.S7[code[6]]} 광학에 대해서는 ${dataDB.S8[code[7]]}<br><br>`;
+        rText += `현재 장비는 ${dataDB.S9[code[8]]} 취미의 끝은 ${dataDB.S10[code[9]]}`;
 
-        comment += "<br>이 결과를 커뮤니티에 인증하여 동료들의 팩폭을 유도하십시오.";
-        document.getElementById('final-desc').innerHTML = comment;
+        // 특수 조합 팩폭 로직 추가 (히든 피스)
+        if(code[2] === 'S' && code[8] === 'S') rText += `<br><br><span style='color:#ff0000'>⚠️ 경고: 탄피 줍는 고통과 기스 걱정 사이에서 자아분열 중입니다.</span>`;
+        if(code[4] === 'O' && code[6] === 'I') rText += `<br><br><span style='color:#ff0000'>⚠️ 경고: 통장이 이미 사망했습니다. 하지만 오리 광학은 영롱하군요.</span>`;
+
+        document.getElementById('final-desc').innerHTML = rText;
     }
 </script>
 
