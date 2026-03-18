@@ -40,7 +40,10 @@
 
         .final-area { display: none; }
         #capture-area { padding: 15px; background: var(--card-bg); border-radius: 15px; }
-        .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
+        
+        /* 타입 배지 크기 수정: 0.8rem -> 1.0rem으로 확대 */
+        .type-badge { display: inline-block; background: var(--accent-color); color: white; padding: 6px 16px; border-radius: 20px; font-size: 1.0rem; font-weight: 800; margin-bottom: 10px; }
+        
         .user-title { font-size: 2.1rem; font-weight: 900; margin: 10px 0 25px 0; line-height: 1.2; word-break: keep-all; color: #fff; }
         .analysis-box { background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
         .analysis-item { font-size: 0.95rem; color: #ccc; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
@@ -173,7 +176,6 @@ function renderQuestion(step) {
     document.getElementById('data-reliability').innerText = (95 + (step * 0.5)).toFixed(1);
 
     Object.entries(q.o).forEach(([key, value], index) => {
-        // 1. 선택지 버튼 생성
         const btn = document.createElement('button');
         btn.innerText = value;
         btn.style.animationDelay = `${index * 0.1}s`;
@@ -184,7 +186,6 @@ function renderQuestion(step) {
         };
         optionsDiv.appendChild(btn);
 
-        // 2. 하단 통계 항목 생성
         const randomPercent = Math.floor(Math.random() * 40) + 10;
         const statItem = document.createElement('div');
         statItem.className = 'stat-item';
