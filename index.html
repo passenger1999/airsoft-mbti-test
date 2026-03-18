@@ -3,48 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-ASTI 3.2 SONAR</title>
+    <title>A-ASTI 3.3 판독기</title>
     <style>
-        :root { --main-color: #00ff41; --bg-color: #050505; --warn-color: #ff3300; }
-        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 10px; line-height: 1.5; }
-        .sonar-panel { width: 100%; max-width: 500px; border: 2px solid #333; padding: 20px; background: #000; box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); margin: 20px auto; }
-        h1 { font-size: 0.8rem; text-align: center; margin: 0 0 20px 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #555; letter-spacing: 3px; }
-        .result-view { font-size: 1.1rem; text-align: center; margin-bottom: 20px; color: #fff; border: 1px solid #222; padding: 12px; background: #0a0a0a; min-height: 25px; letter-spacing: 1px; }
-        .q-text { font-size: 1.1rem; margin-bottom: 20px; color: var(--main-color); border-left: 4px solid var(--main-color); padding-left: 12px; font-weight: bold; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { background: #111; border: 1px solid #444; color: var(--main-color); padding: 15px 5px; cursor: pointer; font-size: 0.9rem; transition: 0.1s; }
-        button:hover { background: #222; border-color: var(--main-color); }
-        button:active { background: #00ff41; color: #000; }
-        .final-area { display: none; padding-bottom: 30px; }
-        .title-box { text-align: center; border: 2px double var(--warn-color); padding: 20px; margin-bottom: 25px; background: #1a0000; }
-        .title-box h2 { font-size: 0.8rem; margin: 0; color: var(--warn-color); text-transform: uppercase; }
-        .user-title { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 10px; display: block; word-break: keep-all; text-shadow: 0 0 10px var(--warn-color); }
-        .desc-box { background: #0a0a0a; border: 1px solid #222; padding: 15px; font-size: 0.95rem; color: #bbb; }
-        .advice-card { margin-top: 20px; padding: 15px; background: #001100; border-left: 4px solid var(--main-color); color: #fff; font-style: italic; font-size: 0.9rem; }
-        .restart-btn { width: 100%; background: #222; color: #888; border: 1px solid #444; padding: 15px; cursor: pointer; margin-top: 30px; font-size: 0.9rem; }
+        :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #121212; --card-bg: #1e1e1e; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', 'Malgun Gothic', sans-serif; margin: 0; padding: 20px; line-height: 1.6; }
+        
+        /* 인터페이스: 밀리터리 걷어내고 깔끔한 카드 스타일 */
+        .container { width: 100%; max-width: 480px; margin: 40px auto; background: var(--card-bg); border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { font-size: 1.2rem; text-align: center; margin-bottom: 30px; font-weight: 800; letter-spacing: -0.5px; color: #888; }
+        
+        .progress-bar { font-size: 0.8rem; color: #555; text-align: center; margin-bottom: 10px; }
+        .q-text { font-size: 1.25rem; margin-bottom: 25px; font-weight: 700; text-align: center; word-break: keep-all; }
+        
+        /* 버튼: 더 넓고 터치하기 편하게 */
+        .btn-grid { display: flex; flex-direction: column; gap: 12px; }
+        button { background: #2a2a2a; border: none; color: #eee; padding: 18px; cursor: pointer; font-size: 1rem; border-radius: 12px; transition: all 0.2s; font-weight: 500; text-align: left; }
+        button:hover { background: #3a3a3a; transform: translateY(-2px); }
+        button:active { background: #444; transform: translateY(0); }
+
+        /* 결과 화면 */
+        .final-area { display: none; animation: fadeIn 0.5s; }
+        .title-box { text-align: center; padding: 30px 10px; margin-bottom: 25px; border-bottom: 1px solid #333; }
+        .title-box h2 { font-size: 0.9rem; margin: 0; color: var(--accent-color); font-weight: 400; }
+        .user-title { font-size: 2rem; font-weight: 900; color: #fff; margin-top: 15px; word-break: keep-all; }
+        
+        .desc-box { font-size: 1rem; color: #aaa; margin-bottom: 25px; padding: 0 10px; }
+        .advice-card { padding: 20px; background: #251010; border-radius: 12px; color: #ff8888; font-size: 0.95rem; border-left: 4px solid var(--accent-color); font-weight: 600; }
+        
+        .restart-btn { width: 100%; background: none; border: 1px solid #444; color: #666; padding: 15px; margin-top: 40px; border-radius: 12px; text-align: center; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="sonar-panel">
-    <h1>[ A-ASTI 3.2 SCANNING SYSTEM ]</h1>
-    <div id="display" class="result-view">SYSTEM_READY</div>
+<div class="container">
+    <h1>A-ASTI 자아 판독 시스템</h1>
+    <div id="progress" class="progress-bar">READY TO SCAN</div>
     
     <div id="test-area">
-        <p id="question" class="q-text">분석을 시작합니다.</p>
+        <p id="question" class="q-text">에어소프트 자아 스캔을 시작합니다.</p>
         <div id="options" class="btn-grid">
-            <button onclick="startTest()" style="grid-column: span 2;">[ 자아 스캔 시작 ]</button>
+            <button onclick="startTest()" style="text-align: center;">[ 스캔 시작하기 ]</button>
         </div>
     </div>
 
     <div id="result-area" class="final-area">
         <div class="title-box">
-            <h2>최종 식별 호칭</h2>
+            <h2>당신의 식별 호칭</h2>
             <span class="user-title" id="final-title"></span>
         </div>
         <div class="desc-box" id="final-desc"></div>
         <div class="advice-card" id="final-advice"></div>
-        <button onclick="location.reload()" class="restart-btn">장비 재부팅 (REBOOT)</button>
+        <button onclick="location.reload()" class="restart-btn">다시 하기</button>
     </div>
 </div>
 
@@ -52,29 +63,31 @@
     let code = [];
     let step = 0;
 
+    // 선택지를 서술형으로 확장
     const questions = [
-        { q: "1. 국가/감성", o: {U:"미제(USA)", R:"러시아(RUS)", E:"유럽(EUR)", K:"국산(KOR)", O:"기타"} },
-        { q: "2. 주력 체급", o: {A:"소총", S:"SMG", B:"저격총", G:"지원화기", P:"권총", T:"샷건"} },
-        { q: "3. 동력원", o: {G:"가스(GBB)", E:"전동(AEG)", H:"HPA", S:"탄피배출", M:"에어코킹"} },
-        { q: "4. 활동 성향", o: {G:"게이머", S:"스틸챌린지", B:"방구석슈터", C:"콜렉터"} },
-        { q: "5. 옵션 등급", o: {O:"오리지널", R:"레플리카", H:"하이브리드", N:"순정파"} },
-        { q: "6. 외형 스타일", o: {T:"택티컬", O:"올드스쿨", M:"미니멀", S:"유니크"} },
-        { q: "7. 소비 패턴", o: {I:"충동구매", P:"계획소비", S:"쟁여두기", R:"중고기변"} },
-        { q: "8. 광학 철학", o: {V:"성능우선", L:"디자인", N:"무광학", M:"고배율"} },
-        { q: "9. 관리 상태", o: {S:"신품급", W:"웨더링", O:"빈티지", D:"방치형"} },
-        { q: "10. 최종 목표", o: {R:"리얼리즘", P:"퍼포먼스", E:"끝판왕", H:"행복찾기"} }
+        { q: "내 심장을 가장 뛰게 만드는 총기의 출신 성분은?", o: {U:"묻고 따지지도 않는 천조국 미제 감성", R:"투박하지만 든든한 불곰국 빨갱이 감성", K:"가슴 한구석이 웅장해지는 자랑스러운 국산", O:"어디에도 속하지 않는 독고다이 혹은 기타"} },
+        { q: "내일 지구가 멸망한다면 딱 한 정 챙길 체급은?", o: {A:"남자의 로망, 든든한 돌격소총(AR/AK)", S:"작고 소중하며 빠른 기관단총(SMG)", B:"고독한 한 발, 숨막히는 저격소총", G:"압도적인 연사 혹은 펌프질의 샷건/기관총"} },
+        { q: "총을 고를 때 절대 포기 못 하는 나의 철학은?", o: {G:"반동 없으면 그게 총인가? 가스/HPA파", E:"게임은 역시 성능과 효율, 전동건(AEG)파", S:"탄피 튀는 소리에 환장하는 탄피배출파", M:"오직 팔 근육으로 장전하는 에어코킹파"} },
+        { q: "주로 어디서 내 장비를 뽐내는 편인가?", o: {G:"흙먼지 마시며 구르는 필드 게이머", S:"0.01초의 정밀함에 목숨 거는 사격 파트", B:"나만의 사격장에서 즐기는 방구석 슈터", C:"닦고 기름치며 감상하는 콜렉터"} },
+        { q: "지금 내 총에 올라간 옵션들의 실제 정체는?", o: {O:"월급을 갈아넣은 귀한 몸, 오리지널 실물", R:"지갑과 타협한 갓성비의 레플리카", H:"중요한 건 실물, 나머지는 레플인 하이브리드", N:"있는 그대로가 아름다운 순정파"} },
+        { q: "내가 은밀하게 추구하는 장비의 추구미는?", o: {T:"실전성 넘치는 풀세팅 택티컬", O:"나무와 쇠 맛이 살아있는 올드스쿨", M:"거추장스러운 건 다 뗀 미니멀리즘", S:"남들은 절대 안 하는 기괴하고 유니크한 취향"} },
+        { q: "월급날 이후 나의 주된 소비 형태는?", o: {I:"눈 마주치면 일단 결제하는 충동구매형", P:"한 달 내내 리뷰 훑는 치밀한 계획소비형", S:"단종될까 무서워 일단 쟁여두는 수집광", R:"중고장터를 내 집 안방처럼 드나드는 기변형"} },
+        { q: "총 쏠 때 조준은 어떤 방식으로?", o: {V:"빠르고 정확한 레드도트/홀로사이트", L:"성능보단 총이랑 잘 어울리는 간지 우선", N:"배터리 따위 안 믿는 가늠자/가늠쇠파", M:"멀리 있는 놈을 당겨 보는 변태적 고배율"} },
+        { q: "내 장비를 대하는 평소의 관리 태도는?", o: {S:"기스 하나에 잠 못 자는 신품급 관리", W:"일부러 까고 긁는 터프한 웨더링 성애자", O:"세월의 흔적이 느껴지는 빈티지 선호", D:"작동만 되면 진흙 묻어도 신경 안 씀"} },
+        { q: "에어소프트 취미의 최종적인 종착역은?", o: {R:"실총과 99.9% 일치하는 리얼리즘", P:"0.1J의 오차도 허용 않는 퍼포먼스", E:"더 이상 살 게 없는 끝판왕 컬렉션", H:"남들이 뭐라든 나만 즐거운 행복한 덕질"} }
     ];
 
-    // 해학적 호칭 소스
-    const pre = { I:"파산 직전의", P:"신중한 척하는", S:"창고 자리가 부족한", R:"중고장터 망령" };
-    const mid = { G:"반동에 미친", E:"보조배터리 노예", H:"가스통 메고 다니는", S:"탄피 줍는", M:"수동 근육" };
-    const suf = { G:"야생 멧돼지", S:"종이 구멍 뚫기 장인", B:"방구석 사령관", C:"장식장 먼지떨이" };
+    // 일반 호칭 (조합형) - 더 독하게 수정 가능
+    const pre = { I:"통장이 비명 지르는", P:"재고 따지다 놓치는", S:"창고 자리가 모자란", R:"장터에서 숨 쉬는" };
+    const mid = { G:"반동에 영혼 판", E:"에너자이저", H:"등에 폭탄 멘", S:"바닥만 보고 걷는", M:"변태 근육" };
+    const suf = { G:"야생 멧돼지", S:"종이 구멍 뚫기 장인", B:"방구석 델타포스", C:"장식장 먼지떨이" };
 
     function startTest() { showQuestion(); }
 
     function showQuestion() {
+        document.getElementById('progress').innerText = `STEP ${step + 1} / ${questions.length}`;
         const q = questions[step];
-        document.getElementById('question').innerText = `${step+1}. ${q.q}`;
+        document.getElementById('question').innerText = q.q;
         const optionsDiv = document.getElementById('options');
         optionsDiv.innerHTML = '';
         for (const [key, value] of Object.entries(q.o)) {
@@ -87,7 +100,6 @@
 
     function selectOption(key) {
         code.push(key);
-        document.getElementById('display').innerText = code.join('-');
         step++;
         if (step < questions.length) showQuestion(); else showResult();
     }
@@ -95,34 +107,37 @@
     function showResult() {
         document.getElementById('test-area').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
+        document.getElementById('progress').style.display = 'none';
         
-        // 호칭 로직 (해학 강화)
+        // 1. 호칭 로직 (특수 호칭 풍성하게 확장)
         let fTitle = `${pre[code[6]]} ${mid[code[2]]} ${suf[code[3]]}`;
         
-        // 특수 호칭 저격
+        // 특수 호칭 저격 (더 많이 추가해보세요)
         if(code[0]==='U' && code[4]==='O' && code[3]==='B') fTitle = "방구석 델타포스";
         if(code[4]==='O' && code[6]==='I') fTitle = "트럼프 똥꼬 닦개";
-        if(code[2]==='S' && code[4]==='N') fTitle = "낭만 없는 탄피 수집가";
+        if(code[2]==='S' && code[4]==='N') fTitle = "낭만 없는 탄피 집착광";
         if(code[0]==='R' && code[3]==='G') fTitle = "시베리아 멧돼지";
-        if(code[2]==='H' && code[3]==='S') fTitle = "등에 메고 다니는 외계인";
+        if(code[3]==='C' && code[8]==='D') fTitle = "장식장 방치하는 골동품상";
+        if(code[2]==='M' && code[1]==='B') fTitle = "산 속의 고독한 수도승";
+        if(code[6]==='R' && code[7]==='L') fTitle = "장터 상주하는 패션 피플";
+        if(code[4]==='O' && code[6]==='S') fTitle = "실물 옵션 쟁여두는 드래곤";
 
         document.getElementById('final-title').innerText = fTitle;
         
-        // 설명 조립 (담백하게)
-        let rText = `분석 코드: <b>${code.join('-')}</b><br><br>`;
-        rText += `당신은 주로 <b>${questions[0].o[code[0]]}</b> 감성의 <b>${questions[1].o[code[1]]}</b>를 사용하며, <b>${questions[2].o[code[2]]}</b> 방식을 선호합니다.<br><br>`;
-        rText += `주로 <b>${questions[3].o[code[3]]}</b>로 활동하며, 장비 세팅은 <b>${questions[4].o[code[4]]}</b>과 <b>${questions[5].o[code[5]]}</b> 스타일을 지향합니다.`;
-
+        // 2. 설명 조립
+        let rText = `분석 결과, 당신은 <b>${questions[0].o[code[0]]}</b> 성향이 강하며 <b>${questions[2].o[code[2]]}</b>의 철학을 고수하고 있습니다. `;
+        rText += `현재 <b>${questions[3].o[code[3]]}</b>로서 <b>${questions[6].o[code[6]]}</b>적인 소비를 보여주네요.`;
         document.getElementById('final-desc').innerHTML = rText;
 
-        // 유형별 한줄 조언 (해학적)
-        let advice = "";
-        if(code[6]==='I') advice = "💡 조언: 일단 카드를 가위로 자르는 것부터 시작합시다.";
-        else if(code[2]==='S') advice = "💡 조언: 탄피 줍다가 허리 나갑니다. 파스 미리 사두세요.";
-        else if(code[3]==='B') advice = "💡 조언: 방구석 타겟지도 좋지만, 가끔은 햇빛 좀 보고 사세요.";
-        else if(code[4]==='O') advice = "💡 조언: 오리 광학은 죄가 없지만, 당신의 통장은 유죄입니다.";
-        else if(code[7]==='M') advice = "💡 조언: 배율로 봐도 안 맞으면 그건 눈 문제가 아니라 총 문제입니다.";
-        else advice = "💡 조언: 취미는 취미일 뿐, 장비 때문에 일상에 지장을 주진 맙시다.";
+        // 3. 독한 조언 한마디
+        let advice = "💡 독설: ";
+        if(code[6]==='I' && code[4]==='O') advice += "오리 광학 살 돈으로 부모님 내복이나 사드리세요. 통장이 울고 있습니다.";
+        else if(code[2]==='S') advice += "탄피 줍다가 허리 나갑니다. 그냥 전동건 쓰고 편하게 사세요. 그게 낭만입니까? 고생이지.";
+        else if(code[3]==='B') advice += "방구석에서 총만 닦지 말고 제발 밖으로 나가서 사람 좀 만나세요. 총이 여친은 아니잖아요.";
+        else if(code[6]==='R') advice += "택배 박스 뜯는 게 취미입니까? 중고장터 좀 그만 보고 일상에 집중하세요.";
+        else if(code[1]==='B' && code[7]==='M') advice += "그 고배율로 뭘 보시게요? 총 쏘는 것보다 남 관찰하는 걸 더 좋아하시는 거 아냐?";
+        else if(code[8]==='S') advice += "총에 기스 날까 봐 무서워서 게임은 어떻게 뛰세요? 그냥 유리장 안에 박제하고 사세요.";
+        else advice += "장비가 문제가 아니라 실력이 문제인 건 알고 계시죠? 장비 탓 좀 그만하세요.";
 
         document.getElementById('final-advice').innerText = advice;
         window.scrollTo(0, 0);
