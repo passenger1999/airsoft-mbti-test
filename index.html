@@ -1,6 +1,4 @@
-</script>
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -33,7 +31,7 @@
         .share-btn { text-align: center; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; }
         .primary { background: var(--accent-color); color: white; }
         .secondary { background: #444; color: white; }
-        .full { background: #3b5998; color: white; } /* 공유용 색상 */
+        .full { background: #3b5998; color: white; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -96,37 +94,32 @@ const specialTitles = [
     { condition: (c) => c[6]==='R' && c[8]==='D', title: "중고장터의 하이에나" },
     { condition: (c) => c[6]==='S' && c[7]==='L', title: "총 훔쳐서 야동 보는 사회부적응자" },
     { condition: (c) => c[6]==='R' && c[4]==='R', title: "남이 쓰다 버린 쓰레기 줍는 하이에나" },
-    { condition: (c) => c[6]==='S' && c[7]==='L', title: "총 훔쳐서 야동 보는 사회부적응자" },
     { condition: (c) => c[6]==='S', title: "필드의 대도(大盜)" },
     { condition: (c) => c[7]==='L', title: "야동 확대범" },
     { condition: (c) => c[7]==='L' && c[3]==='B', title: "조준경으로 야동 보며 딸치는 방구석 특수부대" },
     { condition: (c) => c[8]==='S' && c[3]==='C', title: "기스 날까 봐 박스에만 모시는 상전님" },
-    { condition: (c) => c[9]==='P' && c[7]==='M', title: "타겟지에 구멍 하나만 뚫으려는 결벽증 요원" },
+    { condition: (c) => c[9]==='P' && c[7]==='M', title: "타겟지에 구멍 하나만 뚫으려는 결벽증 요원" }
 ];
 
 const fragments = {
-    // 혈통 (origin)
     origin: { 
         U: "미제 앞잡이고", 
         R: "보드카 냄새 풍기는 강철 막대기 줍고", 
         K: "K-짬내 진동하는 총을 굳이 사고", 
         E: "콧대 높은 유럽산을 애용하고" 
     },
-    // 구동 방식 (power)
     power: { 
         G: "프로판 붙들고 사는", 
         E: "윙탁거리는", 
         S: "탄피에 집착하는", 
         M: "돈이 없는" 
     },
-    // 주 서식지 (place)
     place: { 
         G: "게이머", 
         S: "자칭 사격선수", 
         B: "방구석 델타포스", 
         C: "소믈리에" 
     }
-};
 };
 
 let responses = [];
@@ -163,7 +156,7 @@ function showResult() {
     const code = responses;
     document.getElementById('type-code').innerText = `TYPE: ${code.join('')}`;
 
-    let fTitle = `${fragments.money[code[6]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
+    let fTitle = `${fragments.origin[code[0]]} ${fragments.power[code[2]]} ${fragments.place[code[3]]}`;
     for (const sp of specialTitles) {
         if (sp.condition(code)) { fTitle = sp.title; break; }
     }
