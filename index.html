@@ -2,26 +2,31 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>에어소프트 취향 분석기 V3.2 (Final)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --main-color: #ffffff; --accent-color: #ff3300; --bg-color: #0f0f0f; --card-bg: #1a1a1a; --btn-bg: #2a2a2a; }
-        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; }
-        .container { width: 100%; max-width: 500px; margin: 20px auto; background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; touch-action: manipulation; }
+        .container { width: 100%; max-width: 500px; margin: 20px auto; background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; box-sizing: border-box; }
         .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease; }
         h1 { font-size: 0.9rem; text-align: center; color: #666; letter-spacing: 2px; margin-bottom: 10px; }
         .q-text { font-size: 1.3rem; margin-bottom: 30px; font-weight: 700; text-align: center; word-break: keep-all; min-height: 3.5em; display: flex; align-items: center; justify-content: center; }
-        .btn-grid { display: flex; flex-direction: column; gap: 12px; }
-        button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; position: relative; overflow: hidden; }
+        .btn-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+        button { background: var(--btn-bg); border: 1px solid #333; color: #eee; padding: 16px 20px; cursor: pointer; font-size: 1rem; border-radius: 14px; transition: all 0.2s; font-weight: 500; text-align: left; animation: slideIn 0.4s ease forwards; opacity: 0; position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         button:hover { background: #333; border-color: var(--accent-color); transform: translateX(5px); }
         button:active { transform: scale(0.98); }
         
-        /* 통계 레이아웃 추가 */
-        .stat-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: rgba(255, 51, 0, 0.3); transition: width 1s ease-in-out; }
-        .stat-label { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: #888; font-weight: 400; }
-        .reliability-info { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.75rem; color: #555; text-align: center; }
+        /* 선택지 하단 통계 레이아웃 */
+        .stat-container { margin-top: 50px; padding-top: 20px; border-top: 1px solid #333; animation: fadeIn 1s ease; }
+        .stat-title { font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center; font-weight: 600; }
+        .stat-item { margin-bottom: 12px; }
+        .stat-info { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; color: #aaa; }
+        .stat-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        .stat-fill { height: 100%; background: var(--accent-color); opacity: 0.6; transition: width 1s ease-out; width: 0; }
+
+        .reliability-info { margin-top: 20px; font-size: 0.7rem; color: #555; text-align: center; }
 
         /* 댓글 시스템 스타일 */
         .comment-section { margin-top: 40px; border-top: 1px dashed #444; padding-top: 20px; }
@@ -49,6 +54,7 @@
         .secondary { background: #444; color: white; }
         .full { background: #3b5998; color: white; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -62,8 +68,15 @@
         <div id="options" class="btn-grid">
             <button onclick="startTest()" style="text-align: center; opacity:1; animation:none;">[ 분 석 ]</button>
         </div>
-        <div id="item-stats" style="display:none;" class="reliability-info">
-            항목 방문자: <span id="visit-count">0</span>명 | 데이터 신뢰도: <span id="data-reliability">0</span>%
+        
+        <div id="item-stats" style="display:none;">
+            <div class="stat-container">
+                <div class="stat-title">실시간 유저 선택 분포 (스크롤)</div>
+                <div id="stat-list"></div>
+            </div>
+            <div class="reliability-info">
+                항목 방문자: <span id="visit-count">0</span>명 | 데이터 신뢰도: <span id="data-reliability">0</span>%
+            </div>
         </div>
     </div>
 
@@ -152,29 +165,17 @@ function renderQuestion(step) {
     const q = questions[step];
     document.getElementById('question').innerText = q.q;
     const optionsDiv = document.getElementById('options');
+    const statList = document.getElementById('stat-list');
     optionsDiv.innerHTML = '';
+    statList.innerHTML = '';
     
-    // 통계 신뢰도 업데이트 (시뮬레이션 데이터)
     document.getElementById('visit-count').innerText = (1250 + step * 42).toLocaleString();
     document.getElementById('data-reliability').innerText = (95 + (step * 0.5)).toFixed(1);
 
     Object.entries(q.o).forEach(([key, value], index) => {
+        // 1. 선택지 버튼 생성
         const btn = document.createElement('button');
         btn.innerText = value;
-        
-        // 통계 UI 추가
-        const randomPercent = Math.floor(Math.random() * 40) + 10;
-        const statBar = document.createElement('div');
-        statBar.className = 'stat-bar';
-        setTimeout(() => statBar.style.width = randomPercent + '%', 100);
-        
-        const statLabel = document.createElement('span');
-        statLabel.className = 'stat-label';
-        statLabel.innerText = randomPercent + '%';
-
-        btn.appendChild(statBar);
-        btn.appendChild(statLabel);
-
         btn.style.animationDelay = `${index * 0.1}s`;
         btn.onclick = () => {
             responses.push(key);
@@ -182,6 +183,21 @@ function renderQuestion(step) {
             else showResult();
         };
         optionsDiv.appendChild(btn);
+
+        // 2. 하단 통계 항목 생성
+        const randomPercent = Math.floor(Math.random() * 40) + 10;
+        const statItem = document.createElement('div');
+        statItem.className = 'stat-item';
+        statItem.innerHTML = `
+            <div class="stat-info">
+                <span>${value}</span>
+                <span>${randomPercent}%</span>
+            </div>
+            <div class="stat-track">
+                <div class="stat-fill" style="width: ${randomPercent}%"></div>
+            </div>
+        `;
+        statList.appendChild(statItem);
     });
 }
 
@@ -214,7 +230,6 @@ function showResult() {
     document.getElementById('final-advice').innerText = advice;
 }
 
-// 댓글 추가 함수
 function addComment() {
     const nick = document.getElementById('cmt-nick').value;
     const text = document.getElementById('cmt-text').value;
